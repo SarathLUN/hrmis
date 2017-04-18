@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+
+{% block title %}Pending History {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Leave & Absent Pending Report</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ date_range }}</h3>
+                                </div>
+
+                               <form class="form-horizontal" action="{% url 'attendance:endorsement_report' %}" method="post" id="id_attendance_search_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Employee Name</label>
+                                            <div class="col-md-5">
+                                                <select class="form-control js-example-basic-single" name="employee" id="id_employee" required>
+                                                    <option value="">Select</option>
+                                                    {% for emp in active_employee_list %}
+                                                        <option value="{{ emp.emp_des_id }}" >{{ emp.employee_id.employeeName }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                           <!-- <div class="col-md-4">
+                                                <label class="check"><input type="checkbox" name="all_employee" id="id_all_employee" value="all" class="icheckbox_minimal-grey"/> All Employee</label>
+                                            </div>
+
+                                            -->
+                                        </div>
+
+                                       <!-- <div class="form-group">
+                                            <label class="col-md-3 control-label">Date Range</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control datepicker" placeholder="End Date" name="endDate" id="id_endDate">
+                                            </div>
+                                        </div>
+                                        -->
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+
+                                </form>
+
+                                {% if pending_leave %}
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3 id="custom_panel_heading_id"></h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="printBtn">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="panel-body"  id="dvContents">
+                                        <div class="row">
+                                        <div class="col-xs-6" style="">
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Name</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.employee_id.employeeName }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Department</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.department_id.departmentName }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Designation</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.des_id.designation }}</label>
+
+                                            </div>
+                                           <!-- <div class="form-group">
+                                                <label class="col-xs-4 control-label">Duration</label>
+                                                <label class="col-xs-8 control-label">: {{ start_date|date:"M d, Y" }} -- {{ end_date|date:"M d, Y" }}</label>
+
+                                            </div>
+                                            -->
+
+                                        </div>
+
+                                        <!--
+                                        <div class=" col-xs-6" style="alignment: right;">
+
+
+                                            <div class="form-group" style="">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Total</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Total }}</label>
+
+                                            </div>
+
+                                            <div class="form-group" style="">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Leave Taken</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.leave }}</label>
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Pending</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.pending }}</label>
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Unendorsed</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.unapplied }}</label>
+
+                                            </div>
+
+
+                                            <hr>
+                                        </div>
+                                        -->
+
+                                        </div>
+                                        <br>
+                                        <br>
+
+                                        <table class="table table-responsive table-st dataTable table-hover table-striped" style="font-size: 12px; text-align: left;">
+                                              <tbody>
+
+                                                <tr id="tr_{{ list.id}}" class="my_row">
+                                                    <td id="" class="d">Leave Pending</td>
+                                                    <td id="" class="g">{{ pending_leave }}</td>
+                                                  <!--  <td><a href="#" data-toggle="modal" data-target="#modal_basic">Details</a></td> -->
+                                                   <!-- <td><a href="#" data-toggle="tooltip" data-placement="top" title="Tooltip on topgfdg dfgd gdfg dfgd dfsd">Details</a></td> -->
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                {% endif %}
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="modal_basic" tabindex="-1" role="dialog" aria-labelledby="defModalHead" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="defModalHead">Late Notification</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Department</label>
+                            <div class="col-md-5">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Employee</label>
+                            <div class="col-md-5">
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Date Range</label>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control datepicker" placeholder="modal_Start Date" name="startDate" id="modal_id_startDate" data-date-format="" value="">
+                            </div>
+
+                        </div>
+
+                        <div class="panel-footer">
+                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/app_attendance/page_employee_absent_report.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $(".js-example-basic-single").select2();
+        });
+    </script>
+    <script type="text/javascript">
+
+            jQuery.validator.addMethod("greaterThan",
+                function(value, element, params) {
+
+                    if (!/Invalid|NaN/.test(new Date(value))) {
+                        return new Date(value) >= new Date($(params).val());
+                    }
+
+                    return isNaN(value) && isNaN($(params).val())
+                        || (Number(value) > Number($(params).val()));
+                },'Must be greater or equal.');
+
+            var jvalidate = $("#id_attendance_search_form").validate({
+                ignore: [],
+                rules: {
+
+                    department: {
+                        required: true
+
+                    },
+                    employee: {
+                        required: true
+
+                    },
+                    startDate: {
+                        required: true
+
+                    },
+                    endDate: {
+                        required: true,
+                        greaterThan: "#id_startDate"
+
+                    }
+                    }
+                });
+
+        </script>
+
+
+{% endblock page_js %}

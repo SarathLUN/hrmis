@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Home {% endblock %}
+
+{% block page_css %}
+
+{% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id"></h3>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="">
+                            {% load staticfiles %}
+                            <img src="{% static  'attendance/img/LAMSYS_distribution_sheet_1.jpg' %}" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addLocation.js' %}"></script>
+
+
+
+{% endblock page_js %}

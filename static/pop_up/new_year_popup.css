@@ -1,0 +1,81 @@
+
+#mbt-counter {
+    padding: 10px;
+    font-family: oswald, verdana;
+    background-color: rgba(0, 0, 0, 0)!important;
+    color: #FFF!important;
+    position: absolute;
+    left: 5%;
+    top: 49%;
+    font-size: 17px;
+}
+
+.reveal-modal h1 {
+    position: absolute;
+    left: 5%;
+    font-size: 3em;
+    color: #FFEA00;
+    font-family: oswald;
+    top: 15%;
+    text-shadow: 2px 4px 12px #000;
+
+}
+.reveal-modal h2 {
+    position: absolute;
+    left: 5%;
+    top: 5%;
+    font-family: oswald, arial;
+    font-size: 1.7em;
+    text-shadow: 2px 4px 10px #000;
+    color: #FFF;
+}
+
+.reveal-modal-bg {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    background: rgba(20, 23, 23, 0.81);
+    z-index: 100;
+    display: none;
+    top: 0;
+    left: 0;
+}
+
+
+.reveal-modal {
+    visibility: hidden;
+    left: 50%;
+    top:170px;
+    margin-left: -300px;
+    width: 620px;
+    height: 425px;
+    background: rgba(51, 51, 51, 0) url("img2.gif") no-repeat -17px 0px;
+    position: absolute;
+    z-index: 101;
+    padding: 30px 40px 34px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px;
+    color: #FFF;
+}
+
+.reveal-modal.small         { width: 200px; margin-left: -140px;}
+.reveal-modal.medium         { width: 400px; margin-left: -240px;}
+.reveal-modal.large         { width: 600px; margin-left: -340px;}
+.reveal-modal.xlarge         { width: 800px; margin-left: -440px;}
+
+.reveal-modal .close-reveal-modal {
+    font-size: 32px;
+    line-height: .5;
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    color: #bebebe;
+    text-shadow: 0 -1px 1px rbga(0,0,0,.6);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.reveal-modal .close-reveal-modal:hover {
+    color:#2d2d2f;
+}

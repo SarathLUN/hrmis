@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Leave Category {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Edit Leave Category</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+                <a href="{% url 'leave:addLeaveCategoryPage' 'add' %}" class="pull-right">
+                    <button class="btn btn-info pull-right" id="">
+                        <i class="fa fa-chevron-circle-left"></i>
+                        Return
+                    </button>
+                </a>
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height: 20px;">
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <form class="form-horizontal" action="{% url 'leave:editLeaveCategory' category.id%}" method="post" id="">
+                                {% csrf_token %}
+                                <div class="col-md-2">
+                                    <div class="radio">
+                                        <label>
+                                            <input required type="radio" name="optionsRadios" id="optionsRadios_edit" value="edit" />
+                                            EDIT
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input required type="radio" name="optionsRadios" id="optionsRadios_inactive" value="inactivate"/>
+                                            INACTIVATE
+                                        </label>
+                                    </div>
+                                    <!--
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="optionsRadios" id="optionsRadios_modify" value="modify"/>
+                                            MODIFY
+                                        </label>
+                                    </div>
+                                    -->
+                                </div>
+                                <div class="col-md-10" id="">
+
+                                    <div class="panel panel-default">
+
+                                        <div class="panel-body" style="color: black;">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Name</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control" value="{{ category.name }}" name="name" id="id_name"/>
+                                                    <span id="custom_name_span_id"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Gender</label>
+                                                <div class="col-md-7" id="select_div">
+                                                    <select class="form-control select" name="leave_category_gender" id="id_gender">
+                                                        <option selected="selected" value="{{ category.gender }}">{{ category.get_gender_display }}</option>
+                                                        <option value="0">All</option>
+                                                        <option value="1">Male</option>
+                                                        <option value="2">Female</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-7" id="input_div">
+                                                    <input required type="text" class="form-control" value="{{ category.get_gender_display }}" name="gender_input" id="id_gender_input" readonly/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Allocation(days)</label>
+                                                <div class="col-md-7">
+                                                    <input required type="number" class="form-control" value="{{ category.amount }}" id="id_amount" name="amount"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Approved By</label>
+                                                <div class="col-md-7" id="approved_by_select_div">
+                                                    <select class="form-control select" name="approved_by_select">
+                                                        <option selected="selected" value="0">Supervisor</option>
+                                                        {% for list in active_employee_list %}
+                                                        <option value="{{ list.employee_id.employee_id }}">{{ list.employee_id.employeeName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-7" id="approved_by_input_div">
+                                                    <input required type="text" class="form-control" value="{{ category.confirmed_by }}" name="approved_by_input" id="id_approved_by_input" readonly/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Effective Start Date</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control datepicker" placeholder="Start Date" name="start_date" id="id_startDate" data-date-format="dd-mm-yyyy" value="{{ category.effective_day_from }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Effective End Date</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control datepicker" placeholder="End Date" name="end_date" id="id_endDate" data-date-format="dd-mm-yyyy" value="">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-xs-12 control-label">Description</label>
+                                                <div class="col-md-7 col-xs-12">
+                                                    <textarea class="form-control" rows="3" name="description" id="id_description">{{ category.description }}</textarea>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right"  id="btn_save">Update</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+     <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_leaveCategoryEdit.js' %}"></script>
+{% endblock page_js %}

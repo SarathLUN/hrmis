@@ -1,0 +1,32 @@
+<html>
+<head>
+</head>
+
+<body>
+<h1><a href='https://docs.djangoproject.com/en/dev/ref/request-response/'>DJango Request and Response objects</a></h1>
+
+
+{% if error %}                                                                                                        
+	<p>Error: {{ error }}</p>                                                                                             
+{% endif %}
+
+
+{% if authenticated %}
+	You are logged in as: {{ username }}
+	<form method="get" action="/logout">
+		{% csrf_token %}
+		<input type='submit' value='Logout'/>
+	</form>
+{% else %}
+	<p>Login:
+	<form method="get" action="/hrm">
+		{% csrf_token %}
+		UserName: <input name='username' type='text' placeholder='enter username'/> <br/>
+		Password: <input name='password' type='password' placeholder='enter password'/><br/>
+		<input type='submit' value='Login'/>
+	</form>
+	</p>
+{% endif %}
+
+</body>
+</html>

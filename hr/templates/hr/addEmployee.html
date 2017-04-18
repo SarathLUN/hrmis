@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee Add {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3>Add New Employee</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% if form_message %}
+                                <div style="height: 20px;">
+                                    <h3 style="color: #aa0717; text-align: center;" id="custom_message_id">{{ form_message }}</h3>
+                                </div>
+                                {% endif %}
+                                <br><br>
+                                <form class="form-horizontal" action="{% url 'hr:addEmployeePerfomed' %}" method="post" id="employee_add_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default tabs">
+                                        <ul class="nav nav-tabs" role="tablist">
+                                            <li class="active" id="link1"><a href="#tab-first" role="tab" data-toggle="tab">Personal Data</a></li>
+                                            <li id="link2"><a href="#tab-second" role="tab" data-toggle="tab" >Employee Data</a></li>
+                                            <li id="link3"><a href="#tab-third" role="tab" data-toggle="tab">Contact Data</a></li>
+                                            <li id="link4"><a href="#tab-four" role="tab" data-toggle="tab">Designation Assign</a></li>
+                                        </ul>
+                                        <div class="panel-body tab-content">
+                                            <div class="tab-pane active" id="tab-first">
+                                                <p></p>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Name</label>
+                                                    <div class="col-md-2 col-xs-3">
+                                                        <select class="form-control select" name="title">
+                                                            <option value="1">Mr.</option>
+                                                            <option value="2">Ms.</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-4 col-xs-9">
+                                                        <input required type="text" class="form-control" value="" name="employeeName" id="id_employeeName"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Father Name</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input type="text" class="form-control" value="" name="fatherName"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Mother Name</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input type="text" class="form-control" value="" name="motherName"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Date of Birth</label>
+                                                    <div class="col-md-5 col-xs-12">
+                                                        <div class="input-group">
+                                                            <input required type="text" class="form-control datepicker" name="dateOfBirth" value="" id="date_of_birth"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Blood Group</label>
+                                                    <div class="col-md-2">
+                                                        <select class="form-control select" name="bloodGroup">
+                                                            <option value="">Select</option>
+                                                            <option value="A+">A+</option>
+                                                            <option value="A-">A-</option>
+                                                            <option value="B+">B+</option>
+                                                            <option value="B-">B-</option>
+                                                            <option value="O+">O+</option>
+                                                            <option value="O-">O-</option>
+                                                            <option value="AB+">AB+</option>
+                                                            <option value="AB-">AB-</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Country</label>
+                                                    <div class="col-md-4">
+                                                        <select class="form-control select" name="nationality">
+                                                            <option value="India">India</option>
+                                                            <option selected="selected" value="Bangladesh">Bangladesh</option>
+                                                            <option value="USA">USA</option>
+                                                            <option value="Japan">Japan</option>
+                                                            <option value="Singapur">Singapur</option>
+                                                            <option value="Others">Others</option>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">National Id.</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input type="text" class="form-control" value="" name="nationalId"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Passport No.</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input type="text" class="form-control" value="" name="passportId"/>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+
+                                            <div class="tab-pane" id="tab-second">
+
+                                                <p></p>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Employee Code</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input type="text" class="form-control" value="" name="employeeCode" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Card Id</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input required type="text" class="form-control" value="" name="cardId" id="id_card_id"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Join Date</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <div class="input-group">
+
+                                                            <input required type="text" class="form-control datepicker" name="joiningDate" value="" id="id_join_date">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                 <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Bank Name</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input type="text" class="form-control" value="" name="bankName" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Bank Account No.</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input type="text" class="form-control" value="" name="bankAccountNo" />
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            <div class="tab-pane" id="tab-third">
+                                                <p></p>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">E-mail</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input type="text" class="form-control" value="" placeholder="example@mjlbd.com" name="email"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Mobile No.</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <input required type="text" class="form-control" value="" name="mobile" id="id_mobile"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Present Address</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <textarea class="form-control" rows="3" name="presentAddress"></textarea>
+                                                        <span class="help-block">Present Address of the Employee</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 col-xs-12 control-label">Permanent Address</label>
+                                                    <div class="col-md-6 col-xs-12">
+                                                        <textarea class="form-control" rows="3" name="permanentAddress"></textarea>
+                                                        <span class="help-block">Permanent Address of the Employee</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="tab-pane" id="tab-four">
+
+                                                <p></p>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">Department</label>
+                                                    <div class="col-md-5">
+                                                        <select class="form-control select" name="departmentId" id="id_departmentId">
+                                                            <option value="null">Select</option>
+                                                            {% for dept in department_list %}
+                                                                <option value="{{ dept.department_id }}" >{{ dept.departmentName }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">Designation</label>
+                                                    <div class="col-md-5">
+                                                        <select class="form-control select" name="designationId" id="id_designationId">
+                                                            <option value="null">Select</option>
+                                                            {% for des in designation_list %}
+                                                                <option value="{{ des.des_id }}" >{{ des.designation }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">Location</label>
+                                                    <div class="col-md-5">
+                                                        <select class="form-control select" name="locationId" id="id_location">
+                                                            <option value="null">Select</option>
+                                                            {% for loc in location_list %}
+                                                                <option value="{{ loc.location_id }}" >{{ loc.locationName }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">Supervisor</label>
+                                                    <div class="col-md-5">
+                                                        <select class="form-control select" name="supervisor" id="id_supervisor">
+                                                            <option value="null">Select</option>
+                                                            {% for sup in employee_list %}
+                                                                <option value="{{ sup.employee_id }}" >{{ sup.employeeName }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">Date Start</label>
+                                                    <div class="col-md-5">
+                                                        <input type="date" class="form-control datepicker" value="" placeholder="Effective start Date" name="date" id="id_startDate" data-date-format="dd-mm-yyyy"/>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right">SAVE <span class="fa fa-floppy-o fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/icheck/icheck.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addEmployee.js' %}"></script>
+
+    <script type="text/javascript">
+        var jvalidate = $("#employee_add_form").validate({
+            ignore: [],
+            rules: {
+
+                employeeName: {
+                    required: true
+                },
+                cardId: {
+                    required: true,
+                    min: 0
+                }
+                }
+            });
+
+    </script>
+
+{% endblock page_js %}

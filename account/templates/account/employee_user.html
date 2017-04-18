@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Create User {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Create New Employee User</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height: 20px;">
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ message }}</h3>
+                </div>
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12" id="">
+
+                                <form class="form-horizontal" action="{% url 'account:create_employee_user' %}" method="post" id="id_user_form">
+                                    {% csrf_token %}
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Name</label>
+                                                <div class="col-md-7">
+                                                    <select class="form-control js-example-basic-single" name="name" id="id_name" required>
+                                                        <option value="">Select</option>
+                                                        {% for emp in employee_list %}
+                                                            <option value="{{ emp.employee_id }}" >{{ emp.employeeName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">User Group</label>
+                                                <div class="col-md-5">
+                                                    <select class="form-control js-example-basic-single" name="group" id="id_group" required>
+                                                        <option value="">Select</option>
+                                                        {% for group in user_group %}
+                                                            <option value="{{ group.id }}" >{{ group.group_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Username</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control" placeholder="Enter Username" name="username" id="id_username">
+                                                    <span id="username_span_id" style="color: red"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Password</label>
+                                                <div class="col-md-7">
+                                                    <input required type="password" class="form-control" placeholder="Enter New Password" name="password" id="id_password">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Re Enter Password</label>
+                                                <div class="col-md-7">
+                                                    <input type="password" class="form-control" value="" id="id_password_re" name="password_re" placeholder="Re Enter New Password"/>
+                                                    <span id="password_re_span_id" style="color: red"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right"  id="btn_save">Save</button>
+                                        </div>
+                                    </div>
+
+                                </form>
+
+                                <div class="panel panel-default">
+                                    {% if active_user_list %}
+                                    <div class="panel-heading">
+                                        <h3>User List</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Username</th>
+                                                    <th>Group</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in contacts %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td id="tr_{{ list.id  }}_td_1" class="a">{{ list.id }}</td>
+                                                    <td id="tr_{{ list.id  }}_td_2" class="b">{{ list.user_id.user }}</td>
+                                                    <td id="tr_{{ list.id  }}_td_3" class="c">{{ list.group_id.group_name }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                        <ul class="pagination">
+                                            {% if contacts.has_previous %}
+                                                <li><a href="?page={{ contacts.previous_page_number }}">Previous</a></li>
+                                            {% endif %}
+
+                                            <li><a href="#" class="active">Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}</a></li>
+                                            {% if contacts.has_next %}
+                                                <li><a href="?page={{ contacts.next_page_number }}">Next</a></li>
+                                            {% endif %}
+
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_employee_user.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+    <script type="text/javascript">
+        var jvalidate = $("#id_user_form").validate({
+            ignore: [],
+            rules: {
+
+                startDate: {
+                    required: true,
+
+                },
+                grace_amount: {
+                    required: true,
+                    min: 0,
+                    max: 59
+
+                }
+                }
+            });
+
+    </script>
+{% endblock page_js %}

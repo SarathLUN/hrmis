@@ -1,0 +1,508 @@
+{% extends 'base.html' %}
+{% block page_css %}
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'attendance/css/ladda/ladda-themeless.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'sweetalert/sweetalert.css' %}">
+
+{% endblock page_css %}
+
+{% block title %}Late Endorsement Pending List {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Pending Late Application for Endorsement</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                {% if error_message %}
+                    <div style="height: 20px; text-align: center">
+                        <h3 style="color: #aa1737" id="">{{ error_message }}</h3>
+                    </div>
+                {% endif %}
+                <div style="height: 20px;">
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div class="block">
+
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% if late_history %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Pending List</h3>
+                                      <!--  <a href="#" class="child_1" id="child_1_b">Test</a> -->
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover table-bordered" id="result_table" style="">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Date</th>
+                                                    <th>Reason</th>
+                                                    <!--<th>Action</th> -->
+                                                    <th><button class="btn btn-success btn-sm ">Approve</button></th>
+                                                    <th><button class="btn btn-danger btn-sm ">Reject</button></th>
+                                                  <!--  <th>test</th> -->
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <form method="post">
+                                                {% csrf_token %}
+                                                {% for list in contacts %}
+
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td id="tr_td_1_{{ list.id }}" class="a"><a class="ajax_link" data-toggle="modal" data-target="#modal_large" onclick="get_list({{ list.emp_id.employee_id }})">{{ list.emp_id.employeeName }}</a></td>
+                                                    <td id="tr_td_2_{{ list.id }}" class="b">{{ list.date|date }}</td>
+                                                    {% if list.sms_text|length <= 159 and ' ' in list.sms_text|slice:"2:" %}
+                                                    <td id="tr_td_4_{{ list.id }}" class="d" >{{ list.sms_text }}</td>
+                                                    {% else %}
+                                                    <td id="tr_td_4_{{ list.id }}" class="d" style="color: firebrick;" data-toggle="tooltip" data-placement="top" title="{{ list.sms_text }}">UNREADABLE/LONG MESSAGE</td>
+                                                    {% endif %}
+                                                    <!--
+                                                    <td id="tr_td_5_{{ list.id }}" class="f">
+                                                        <!--
+                                                        <a href="#" data-toggle="modal" data-target="#modal_basic" class="show_modal" id="{{ list.id }}">Details</a>
+                                                        /
+
+                                                        <a href="{% url 'attendance:lateAttendanceEndorsement' list.id 'accept' %}" class="a_value">Approve</a>
+                                                        /
+                                                        <a href="{% url 'attendance:lateAttendanceEndorsement' list.id 'reject' %}" class="a_value">Reject</a>
+                                                        /
+                                                        -->
+                                                    <!--
+                                                        <span class="label label-warning open_link" id="open_link_{{ list.id }}" style='cursor: pointer;'>Approve</span>
+                                                        &nbsp;
+                                                        <span class="label label-danger reject_link" id="reject_link_{{ list.id }}" style='cursor: pointer'>Reject</span>
+
+                                                        <br>
+                                                        <a href="{% url 'attendance:lateAttendanceEndorsement' list.id 'lateaccept' %}" class="child_1" id="child_1_open_link_{{ list.id }}">Late</a>
+
+                                                        <a href="{% url 'attendance:lateAttendanceEndorsement' list.id 'otheraccept' %}" class="child_2" id="child_2_open_link_{{ list.id }}">   /  Others</a>
+
+                                                        <a href="{% url 'attendance:lateAttendanceEndorsement' list.id 'latereject' %}" class="child_3" id="child_3_reject_link_{{ list.id }}">Late</a>
+
+                                                        <a href="{% url 'attendance:lateAttendanceEndorsement' list.id 'otherreject' %}" class="child_4" id="child_4_reject_link_{{ list.id }}">   /  Others</a>
+                                                    </td>
+                                                    -->
+
+                                                    <td>
+                                                        <button class="btn btn-xs btn-success" type="button" id="btn1_{{ list.id }}" style="margin-bottom: 1px; width: 48px; height: 20px; border-radius: 5px;" onclick="performEndorsement({{ list.id }}, '1', this.id);">Late</button>
+                                                        <br>
+                                                        <button class="btn btn-xs btn-info" type="button" id="btn3_{{ list.id }}" style="margin-top: 1px; width: 48px; height: 20px; border-radius: 5px;" onclick="performEndorsement({{ list.id }}, '3', this.id);">Others</button>
+                                                    </td>
+                                                    <td>
+                                                        <input class="btn btn-xs btn-danger " type="button" value="Habitual Late" id="btn2_{{ list.id }}" style="margin-bottom: 1px; width: 80px; height: 20px; border-radius: 5px;"  onclick="performEndorsement({{ list.id }}, '2', this.id);">
+                                                        <br>
+                                                        <input class="btn btn-xs btn-danger" type="button" value="Others" id="btn4_{{ list.id }}" style="margin-top: 1px; width: 48px; height: 20px; border-radius: 5px;" onclick="performEndorsement({{ list.id }}, '4', this.id);">
+
+                                                    </td>
+                                                    <!--
+                                                    <td>
+
+                                                        <ul class="x-navigation" style="width: 150px; background: none;">
+                                                            <li class="xn-openable" style="background: none;">
+                                                                <a href="#">Approve</a>
+                                                                <ul>
+                                                                    <li class="">
+                                                                        <a href="#">Late Endorsement</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a href="#">Others</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+
+                                                    </td>
+                                                    -->
+
+                                                </tr>
+                                            {% endfor %}
+                                                </form>
+                                            </tbody>
+
+                                        </table>
+                                        {% if contacts.has_other_pages %}
+                                            <ul class="pagination">
+                                                {% if contacts.has_previous %}
+                                                    <li><a href="?page={{ contacts.previous_page_number }}">&laquo;</a></li>
+                                                {% else %}
+                                                    <li class="disabled"><span>&laquo;</span></li>
+                                                {% endif %}
+                                                {% for i in contacts.paginator.page_range %}
+                                                      {% if contacts.number == i %}
+                                                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                                      {% else %}
+                                                        <li><a href="?page={{ i }}">{{ i }}</a></li>
+                                                      {% endif %}
+                                                {% endfor %}
+                                                {% if contacts.has_next %}
+                                                    <li><a href="?page={{ contacts.next_page_number }}">&raquo;</a></li>
+                                                {% else %}
+                                                    <li class="disabled"><span>&raquo;</span></li>
+                                                {% endif %}
+
+                                            </ul>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                                {% else %}
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa; text-align: center" id="custom_message_id">No Application for Approval</h3>
+                                </div>
+                                    <br><br>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- previous month late approval tabe display is close for temporarily dated 05/12/2016-->
+                    <!--
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Previous Late Endorsements:</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover table-bordered" id="result_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Date</th>
+                                                    <th>Entry Time</th>
+                                                    <th>Reason</th>
+                                                    <th>Action</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in current_month_late_history %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td id="tr_td_1_{{ list.id }}" class="a">{{ list.name }}</td>
+                                                    <td id="tr_td_2_{{ list.id }}" class="b">{{ list.date|date }}</td>
+                                                    <td id="tr_td_3_{{ list.id }}" class="c">{{ list.entry_time }}</td>
+                                                    {% if list.reason == 'UNREADABLE MESSAGE !!!' %}
+                                                    <td id="tr_td_4_{{ list.id }}" class="d" style="color: firebrick;">{{ list.reason }}</td>
+                                                    {% else %}
+                                                    <td id="tr_td_4_{{ list.id }}" class="d" >{{ list.reason }}</td>
+                                                    {% endif %}
+                                                    <td id="tr_td_5_{{ list.id }}" class="f">{{ list.status }}
+                                                    </td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    -->
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal" id="modal_large" tabindex="-1" role="dialog" aria-labelledby="largeModalHead" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="largeModalHead">Large Modal</h4>
+                </div>
+                <div class="modal-body">
+                    Some content in modal example
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/laddda/ladda.jquery.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/laddda/ladda.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/laddda/spin.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'sweetalert/sweetalert.min.js' %}"></script>
+
+        <script type="text/javascript" src="{%  static 'attendance/js/page_customJS/page_lateAttendance.js' %}"></script>
+        <script>
+
+            Ladda.bind('input[type=button]');
+            //For getting CSRF token
+            function getCookie(name) {
+                      var cookieValue = null;
+                      if (document.cookie && document.cookie != '') {
+                            var cookies = document.cookie.split(';');
+                      for (var i = 0; i < cookies.length; i++) {
+                           var cookie = jQuery.trim(cookies[i]);
+                      // Does this cookie string begin with the name we want?
+                      if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                          break;
+                         }
+                      }
+                  }
+             return cookieValue;
+            }
+
+            function get_list(emp_id){
+
+                var csrftoken = getCookie('csrftoken');
+                var ajax_option = '2';
+                $.ajax({
+                    url : window.location.href,
+                    type : "POST",
+                    data : {
+                        csrfmiddlewaretoken : csrftoken,
+                        ajax_option : ajax_option,
+                        emp_id : emp_id
+                    },
+                    success : function (json) {
+                        alert(json['obj']);
+                    },
+                    // handle a non-successful response
+                         error : function(xhr,errmsg,err) {
+                         console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                         alert(err);
+                        }
+                });
+            }
+{#            $(".ajax_link").click(function(){#}
+{#                var csrftoken = getCookie('csrftoken');#}
+{#                var ajax_option = '2';#}
+{#                $.ajax({#}
+{#                    url : window.location.href,#}
+{#                    type : "POST",#}
+{#                    data : {#}
+{#                        csrfmiddlewaretoken : csrftoken,#}
+{#                        ajax_option : ajax_option#}
+{#                    },#}
+{#                    success : function (json) {#}
+{#                        alert(json['val']);#}
+{#                    },#}
+{#                    // handle a non-successful response#}
+{#                         error : function(xhr,errmsg,err) {#}
+{#                         console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console#}
+{#                         alert(err);#}
+{#                        }#}
+{#                });#}
+{#            });#}
+
+            function performEndorsement(msg_id, endorsement_id, id){
+
+                //Prepare csrf token
+                var csrftoken = getCookie('csrftoken');
+
+                if($("#"+id).text() == "Reverse"){
+                    //alert($("#"+id).text());
+                    swal({
+                      title: "Are You Sure!!",
+                      text: "Do You Want to Reverse the Endorsement?",
+                      type: "warning",
+                      confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, Reverse it!",
+                      showCancelButton: true,
+                      closeOnConfirm: false,
+                      showLoaderOnConfirm: true,
+                    },
+                    function(){
+                      setTimeout(function(){
+                          $.ajax({
+                               url : window.location.href, // the endpoint,commonly same url
+                               type : "POST", // http method
+                               data : { csrfmiddlewaretoken : csrftoken,
+                                    endorsement_id : '0',
+                                    ajax_option : '1',
+                                    msg_id : msg_id
+                         }, // data sent with the post request
+
+                         // handle a successful response
+                         success : function(json) {
+
+                             console.log(json); // another sanity check
+
+                             $("#btn1_"+msg_id).removeClass("active");
+                             $("#btn1_"+msg_id).removeClass("disabled");
+                             $("#btn1_"+msg_id).removeClass("btn-default");
+                             $("#btn1_"+msg_id).addClass("btn-success");
+                             $("#btn1_"+msg_id).text("Late");
+
+                             $("#btn2_"+msg_id).removeClass("active");
+                             $("#btn2_"+msg_id).removeClass("disabled");
+                             $("#btn2_"+msg_id).removeClass("btn-default");
+                             $("#btn2_"+msg_id).addClass("btn-danger");
+                             $("#btn2_"+msg_id).text("Habitual Late");
+
+                             $("#btn3_"+msg_id).removeClass("active");
+                             $("#btn3_"+msg_id).removeClass("disabled");
+                             $("#btn3_"+msg_id).removeClass("btn-default");
+                             $("#btn3_"+msg_id).addClass("btn-info");
+                             $("#btn3_"+msg_id).text("Others");
+
+                             $("#btn4_"+msg_id).removeClass("active");
+                             $("#btn4_"+msg_id).removeClass("disabled");
+                             $("#btn4_"+msg_id).removeClass("btn-default");
+                             $("#btn4_"+msg_id).addClass("btn-danger");
+                             $("#btn4_"+msg_id).text("Others");
+
+                             swal("Reversed!", "Your Endrosement has been Reversed.", "success");
+                         },
+
+                         // handle a non-successful response
+                         error : function(xhr,errmsg,err) {
+                            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                             swal("Error!", "Unknown Error Occured.", "error");
+                         }
+                         });
+
+                      }, 2000);
+                    });
+                }
+
+                else{
+
+                    $.ajax({
+                       url : window.location.href, // the endpoint,commonly same url
+                       type : "POST", // http method
+                       data : { csrfmiddlewaretoken : csrftoken,
+                            endorsement_id : endorsement_id,
+                            msg_id : msg_id
+                        }, // data sent with the post request
+
+                         // handle a successful response
+                         success : function(json) {
+                            console.log(json); // another sanity check
+                                //$("#id_endDate").prop("value", json['end_date']);
+
+                             if(json['choice'] == '1'){
+
+                                 $("#btn1_"+msg_id).addClass("active");
+                                 $("#btn1_"+msg_id).text("Reverse");
+
+                                 //$("#btn1_"+msg_id).before('<i class="fa fa-check"></i>');
+
+                                 $("#btn2_"+msg_id).addClass("disabled");
+                                 $("#btn2_"+msg_id).removeClass("btn-danger");
+                                 $("#btn2_"+msg_id).addClass("btn-default");
+
+                                 $("#btn3_"+msg_id).addClass("disabled");
+                                 $("#btn3_"+msg_id).removeClass("btn-info");
+                                 $("#btn3_"+msg_id).addClass("btn-default");
+
+                                 $("#btn4_"+msg_id).addClass("disabled");
+                                 $("#btn4_"+msg_id).removeClass("btn-danger");
+                                 $("#btn4_"+msg_id).addClass("btn-default");
+                             }
+                             else if(json['choice'] == '2'){
+
+                                 $("#btn2_"+msg_id).addClass("active");
+                                 $("#btn2_"+msg_id).text("Reverse");
+
+
+                                 $("#btn1_"+msg_id).addClass("disabled");
+                                 $("#btn1_"+msg_id).removeClass("btn-success");
+                                 $("#btn1_"+msg_id).addClass("btn-default");
+
+                                 $("#btn3_"+msg_id).addClass("disabled");
+                                 $("#btn3_"+msg_id).removeClass("btn-info");
+                                 $("#btn3_"+msg_id).addClass("btn-default");
+
+                                 $("#btn4_"+msg_id).addClass("disabled");
+                                 $("#btn4_"+msg_id).removeClass("btn-danger");
+                                 $("#btn4_"+msg_id).addClass("btn-default");
+                             }
+                             else if(json['choice'] == '3'){
+
+                                 $("#btn3_"+msg_id).addClass("active");
+                                 $("#btn3_"+msg_id).text("Reverse");
+
+
+                                 $("#btn1_"+msg_id).addClass("disabled");
+                                 $("#btn1_"+msg_id).removeClass("btn-success");
+                                 $("#btn1_"+msg_id).addClass("btn-default");
+
+                                 $("#btn2_"+msg_id).addClass("disabled");
+                                 $("#btn2_"+msg_id).removeClass("btn-danger");
+                                 $("#btn2_"+msg_id).addClass("btn-default");
+
+                                 $("#btn4_"+msg_id).addClass("disabled");
+                                 $("#btn4_"+msg_id).removeClass("btn-danger");
+                                 $("#btn4_"+msg_id).addClass("btn-default");
+                             }
+                             else if(json['choice'] == '4'){
+
+                                 $("#btn4_"+msg_id).addClass("active");
+                                 $("#btn4_"+msg_id).text("Reverse");
+
+
+                                 $("#btn1_"+msg_id).addClass("disabled");
+                                 $("#btn1_"+msg_id).removeClass("btn-success");
+                                 $("#btn1_"+msg_id).addClass("btn-default");
+
+                                 $("#btn2_"+msg_id).addClass("disabled");
+                                 $("#btn2_"+msg_id).removeClass("btn-danger");
+                                 $("#btn2_"+msg_id).addClass("btn-default");
+
+                                 $("#btn3_"+msg_id).addClass("disabled");
+                                 $("#btn3_"+msg_id).removeClass("btn-info");
+                                 $("#btn3_"+msg_id).addClass("btn-default");
+                             }
+
+
+                         },
+
+                         // handle a non-successful response
+                         error : function(xhr,errmsg,err) {
+                         console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                         alert(err);
+                        }
+                    });
+                }
+            }
+        </script>
+
+{% endblock page_js %}

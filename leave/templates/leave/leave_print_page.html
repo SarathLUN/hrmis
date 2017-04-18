@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {% load staticfiles %}
+    <!-- CSS INCLUDE -->
+    <link rel="stylesheet" type="text/css" id="theme" href="{% static 'attendance/css/theme-default.css' %}"/>
+    <!-- EOF CSS INCLUDE -->
+    <script src=""></script>
+
+
+
+</head>
+<body>
+    <div class="block">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="form-horizontal">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="defModalHead">Leave Form</h4>
+                </div>
+                <div class="modal-body" id="dvContents">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="block">
+                                <style>
+                                    .borderless tr, .borderless td {
+                                        border-top: none !important;
+                                    }
+
+                                    .small_table tbody tr td{
+                                        padding: 4px;;
+                                    }
+
+                                </style>
+                                <div class="page-content-wrap">
+                                    <table class="table borderless">
+                                        <tbody style="">
+                                            <tr style="">
+                                                <td style="width: 33%"><h4></h4></td>
+                                                <td style="width: 33%"></td>
+                                                <td style="width: 33%; text-align: right;"><img src="{% static 'attendance/img/Omera-Logo-with-border.png'%}" style="height: 40px; width: 140px;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 33%"></td>
+                                                <td style="width: 33%; text-align: center;">Leave Application Form</td>
+                                                <td style="width: 33%"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table class="table borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 70%;">
+                                                    <table class="">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="width: 25%"><h5>Employee Name </h5></td> </td>
+                                                                <td style="width: 40%;"><h6>: &nbsp;&nbsp;{{ leave_obj.employee_id.employeeName }}</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 25%"><h5>Designation </h5></td> </td>
+                                                                <td style="width: 40%;"><h6>: &nbsp;&nbsp;{{ emp_obj.des_id.designation }}</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 25%"><h5>Department </h5></td> </td>
+                                                                <td style="width: 40%;"><h6>: &nbsp;&nbsp;{{ emp_obj.department_id.departmentName }}</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 25%"><h5>Leave Type </h5></td> </td>
+                                                                <td style="width: 40%;"><h6>: &nbsp;&nbsp;{{ leave_obj.type.name }}</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 25%"><h5>Leave Applied </h5></td> </td>
+                                                                <td style="width: 40%;"><h6>: &nbsp;&nbsp;{{ leave_obj.date_from }}  --  {{ leave_obj.date_to }}</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 25%"><h5>Total </h5></td> </td>
+                                                                <td style="width: 40%;"><h6>: &nbsp;&nbsp;{{ leave_obj.count }}&nbsp;day(s)</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 25%"><h5>Supervisor </h5></td> </td>
+                                                                <td style="width: 40%;"><h6>: &nbsp;&nbsp;{{ leave_obj.endorsed_by.employeeName }}</h6></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                                <td style="width: 30%;">
+                                                    <table class="table table-bordered small_table" style="">
+                                                        <tbody style="border-top: thin">
+                                                            <tr>
+                                                                <td style="padding-top: 4px;"><h6>Leave Entitled &nbsp;&nbsp;&nbsp;</h6></td>
+                                                                <td style="text-align: center; padding: 4px;"><h6>{{ entitled }} day(s)</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="padding-top: 4px;"><h6>Leave Endorsed &nbsp;&nbsp;&nbsp;</h6></td>
+                                                                <td style="text-align: center; padding: 4px;"><h6>{{ taken }} day(s)</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="padding-top: 4px;"><h6>Leave Pending &nbsp;&nbsp;&nbsp;</h6></td>
+                                                                <td style="text-align: center; padding: 4px;"><h6>{{ pending }} day(s)</h6></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="padding-top: 4px;"><h6>Leave Applied &nbsp;&nbsp;&nbsp;</h6></td>
+                                                                <td style="text-align: center; padding: 4px;"><h6>{{ applied_for }} day(s)</h6></td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td style="padding-top: 4px;"><h6>Balance &nbsp;&nbsp;&nbsp;</h6></td>
+                                                                <td style="text-align: center; padding: 4px;"><h6>{{ balance }} day(s)</h6></td>
+                                                            </tr>
+
+                                                        </tbody>
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 50%;">
+                                                    ______________________________
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">
+                                                    <h6>Signature of Applicant</h6>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <table class="">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 50%;">
+                                                    ______________________________
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">
+                                                    <h6>Signature of Supervisor</h6>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+
+                                    <table class="table">
+                                        <tr>
+                                            <td style="text-align: center">
+                                                <p style="font-size: 10px;">Note: <i>It is requested to the supervisors to update the system accordingly</i></p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button class="btn btn-success pull-right" id="printBtn">Print <span class="fa fa-print fa-right"></span></button>
+
+                </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {% load staticfiles %}
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/jquery/jquery-2.2.3.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/jquery/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/jquery/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/additonal_js/jQuery.print.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/additonal_js/printThis.js' %}"></script>
+    <script type="text/javascript">
+        $(function() {
+            $("#hrefPrint").click(function() {
+            // Print the DIV.
+            $("#printdiv").printThis({title: 'new doc'});
+            //return (false);
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#printBtn").click(function () {
+
+                var contents = $("#dvContents").html();
+                var frame1 = $('<iframe />');
+                frame1[0].name = "frame1";
+               // frame1.css({ "position": "relative", "top": "-1000000px" });
+                $("body").append(frame1);
+                var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
+                frameDoc.document.open();
+                //Create a new HTML document.
+
+                frameDoc.document.write('<html><head><title>Leave Application Form</title>');
+                frameDoc.document.write('<meta http-equiv="X-UA-Compatible" content="IE=edge" />');
+                frameDoc.document.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
+
+                frameDoc.document.write('<meta name="viewport" content="width=device-width, initial-scale=1" />');
+
+                //Append the external CSS file.
+                frameDoc.document.write('<link href="../../../static/attendance/css/theme-default.css" rel="stylesheet" type="text/css" media="print" />');
+                frameDoc.document.write('<link href="../../../static/attendance/css/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css" media="print" />');
+                frameDoc.document.write('</head><body>');
+
+                //Append the DIV contents.
+
+                frameDoc.document.write(contents);
+                frameDoc.document.write('</body></html>');
+                frameDoc.document.close();
+                setTimeout(function () {
+                    window.frames["frame1"].focus();
+                    window.frames["frame1"].print();
+                    frame1.remove();
+                }, 500);
+            });
+        });
+    </script>
+</body>
+
+</html>

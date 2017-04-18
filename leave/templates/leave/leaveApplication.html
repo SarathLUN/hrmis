@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Pending Leave List {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h2 id="custom_panel_heading_id">Pending Applications for Approval</h2>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height: 20px;">
+                    {% if error_message %}
+                        <div style="height: 20px; text-align: center">
+                            <h3 style="color: #aa1737" id="">{{ error_message }}</h3>
+                        </div>
+                    {% endif %}
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div class="block">
+                    {% if pending_application_list %}
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Pending Application for Approval</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Employee</th>
+                                                    <th>Leave Type</th>
+                                                    <th>Reason</th>
+                                                    <th>From Date</th>
+                                                    <th>To Date</th>
+                                                    <th>Total</th>
+                                                    <th>Remaining</th>
+                                                    <th>Action</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in pending_application_list %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ list.employee_id.employeeName }}</td>
+                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.type.name }}</td>
+                                                    <td id="tr_{{ list.id }}_td_3" class="c">{{ list.description }}</td>
+                                                    <td id="tr_{{ list.id }}_td_4" class="d">{{ list.date_from }}</td>
+                                                    <td id="tr_{{ list.id }}_td_5" class="e">{{ list.date_to }}</td>
+                                                    <td id="tr_{{ list.id }}_td_6" class="f">{{ list.count }}</td>
+                                                    <td id="tr_{{ list.id }}_td_8" class="h">{{ list.leave_history_table.balance }}</td>
+                                                    <td id="tr_{{ list.id }}_td_7" class="g">
+                                                        <a href="{% url 'leave:applicationApproval' list.id 'approved' %}">Approve</a>
+                                                        /
+                                                        <a href="{% url 'leave:applicationApproval' list.id 'reject' %}">Reject</a>
+                                                    </td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {% else %}
+                    <div style="height: 20px;">
+                        <h3 style="color: #0077aa; text-align: center" id="custom_message_id">No Application for Approval</h3>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="block">
+                    {% if pending_confirmation_list %}
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Pending Application for Confirmation</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Employee</th>
+                                                    <th>Leave Type</th>
+                                                    <th>Reason</th>
+                                                    <th>From Date</th>
+                                                    <th>To Date</th>
+                                                    <th>Total</th>
+                                                    <th>Action</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in pending_confirmation_list %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td id="c_tr_{{ list.id }}_td_1" class="a">{{ list.employee_id.employeeName }}</td>
+                                                    <td id="c_tr_{{ list.id }}_td_2" class="b">{{ list.type.name }}</td>
+                                                    <td id="c_tr_{{ list.id }}_td_3" class="c">{{ list.description }}</td>
+                                                    <td id="c_tr_{{ list.id }}_td_4" class="d">{{ list.date_from }}</td>
+                                                    <td id="c_tr_{{ list.id }}_td_5" class="e">{{ list.date_to }}</td>
+                                                    <td id="c_tr_{{ list.id }}_td_6" class="f">{{ list.count }}</td>
+                                                    <td id="c_tr_{{ list.id }}_td_7" class="g">
+                                                        <a href="{% url 'leave:applicationApproval' list.id 'approved' %}">Approve</a>
+                                                        /
+                                                        <a href="{% url 'leave:applicationApproval' list.id 'reject' %}">Reject</a>
+                                                    </td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_leaveApplication.js' %}"></script>
+{% endblock page_js %}

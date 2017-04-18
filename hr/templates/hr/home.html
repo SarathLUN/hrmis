@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Home {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">LAMSYS</h3>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                                </div>
+                                <form class="form-horizontal" action="{% url 'hr:addLocationPerfomed' %}" method="post" id="id_dept_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Location Name</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control" value="" name="locationName" id="id_locationName"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Location Code</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" value="" id="id_locationCode" name="locationCode"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Description</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" value="" id="id_description" name="description"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right" id="btn_save">Save <span class="fa fa-floppy-o fa-right"></span></button>
+                                        </div>
+
+                                    </div>
+
+                                </form>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Location Table</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Location Name</th>
+                                                    <th>Code</th>
+                                                    <th>Description</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for loc in location_list %}
+                                                <tr id="tr_{{ loc.location_id }}" class="my_row">
+                                                    <td id="tr_{{ loc.location_id }}_td_1" class="a">{{ forloop.counter }}</td>
+                                                    <td id="tr_{{ loc.location_id }}_td_2" class="b">{{ loc.locationName }}</td>
+                                                    <td id="tr_{{ loc.location_id }}_td_3" class="c">{{ loc.locationCode }}</td>
+                                                    <td id="tr_{{ loc.location_id }}_td_4" class="d">{{ loc.description }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addLocation.js' %}"></script>
+
+{% endblock page_js %}

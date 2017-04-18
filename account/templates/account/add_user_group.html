@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Add User Group {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3>User Group</h3>
+
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+
+                        <div class="row">
+
+                            <div class="col-md-12">
+                                {% if message %}
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ message }}</h3>
+
+                                </div>
+                                    <br>
+                                {% endif %}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4>Present Groups</h4>
+                                        </div>
+                                        <div class="panel-body">
+                                            {% if active_group_list %}
+                                                {% for list in active_group_list %}
+                                                    <label class="check"><input type="checkbox" class="icheckbox" name="dayName" value="{{ list.id }}" checked="checked" disabled/> {{ list.group_name }}</label>
+                                                    <br>
+                                                {% endfor %}
+
+                                            {% else %}
+                                                <div style="height: 20px;">
+                                                    <h3 style="color: #047d65" id="">No active user group</h3>
+
+                                                </div>
+
+                                            {% endif %}
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div class="col-md-7" id="">
+                                    <div class="panel-heading">
+                                        <h4>Add New Group</h4>
+                                    </div>
+                                    <form class="" action="{% url 'account:add_new_group' %}" method="post" id="id_group_name">
+                                        {% csrf_token %}
+                                        <div class="panel panel-default">
+                                            <div class="panel-body">
+                                                <div class="form-group">
+                                                    <label class="col-md-4 control-label">Group Name</label>
+                                                    <div class="col-md-8">
+                                                        <input required type="text" class="form-control" placeholder="Group Name" name="group_name" id="id_group_name">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="panel-footer">
+
+                                                <button class="btn btn-primary pull-right" id="btn_save">Save <span class="fa fa-floppy-o fa-right"></span></button>
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                {% if active_user_list %}
+                                <div class="panel-heading">
+                                    <h3>User List</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table dataTable table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Username</th>
+                                                <th>Group</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {% for list in active_user_list %}
+                                            <tr id="tr_{{ list.id }}" class="my_row">
+                                                <td id="tr_{{ list.id  }}_td_1" class="a">{{ list.id }}</td>
+                                                <td id="tr_{{ list.id  }}_td_2" class="b">{{ list.user_id.user }}</td>
+                                                <td id="tr_{{ list.id  }}_td_3" class="c">{{ list.group_id.group_name }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/app_account/page_add_user_group.js' %}"></script>
+
+{% endblock page_js %}

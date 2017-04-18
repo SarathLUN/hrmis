@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Setting {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Report Setting</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ obj.employeeName }}</h3>
+                                </div>
+
+                               <form class="form-horizontal" action="{% url 'attendance:set_parent_child' %}" method="post" id="id_parent_child_setting">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">Select Parent</label>
+                                            <div class="col-md-5">
+                                                <select class="form-control " name="parent" id="id_parent">
+                                                    <option value="">Select</option>
+                                                    {% for list in employee_list %}
+                                                        <option value="{{ list.employee_id.employee_id }}" >{{ list.employee_id.employeeName }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-save fa-right"></span></button>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-footer">
+                                        </div>
+                                    </div>
+                               </form>
+
+                                {% if parent_id %}
+                                <form class="form-horizontal" action="{% url 'attendance:create_relation' parent_id %}" method="post">
+
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">Select Child</label>
+                                            <div class="col-md-3 col-md-offset-6">
+                                                <button class="btn btn-primary pull-right" id="">Save <span class="fa fa-save fa-right"></span></button>
+                                            </div>
+                                        </div>
+
+                                        {% for employee in child_employee_list %}
+                                        <div class="form-group">
+                                            <label class="col-md-1 control-label"></label>
+                                            <div class="col-md-4">
+
+                                                <input type="checkbox" class="icheckbox" name="child_list" value="{{ employee.employee_id.employee_id }}" id="checkbox_{{ forloop.counter }}" {% if employee.employee_id_id in old_list %} checked {% endif %}/>
+                                                &nbsp;{{ employee.employee_id.employeeName }}
+
+                                            </div>
+                                            <label class="col-md-2 control-label" style="text-align: left;">{{ employee.department_id.departmentName }}</label>
+                                            <label class="col-md-3 control-label" style="text-align: left;">{{ employee.des_id.designation }}</label>
+
+                                        </div>
+                                        {% endfor %}
+
+
+                                        <div class="panel-footer">
+                                        </div>
+                                    </div>
+
+                                </form>
+                                {% endif %}
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="modal_basic" tabindex="-1" role="dialog" aria-labelledby="defModalHead" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="form-horizontal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="defModalHead">Late Notification</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Department</label>
+                            <div class="col-md-5">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Employee</label>
+                            <div class="col-md-5">
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Date Range</label>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate" data-date-format="" value="">
+                            </div>
+
+                        </div>
+
+                        <div class="panel-footer">
+                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/app_attendance/page_attendance_report_setting.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+
+
+    <script type="text/javascript">
+
+        jQuery.validator.addMethod("greaterThan",
+            function(value, element, params) {
+
+                if (!/Invalid|NaN/.test(new Date(value))) {
+                    return new Date(value) >= new Date($(params).val());
+                }
+
+                return isNaN(value) && isNaN($(params).val())
+                    || (Number(value) > Number($(params).val()));
+            },'Must be greater or equal.');
+
+
+            var jvalidate = $("#id_attendance_search_form").validate({
+                ignore: [],
+                rules: {
+
+                    department: {
+                        required: true
+
+                    },
+                    employee: {
+                        required: true
+
+                    },
+                    startDate: {
+                        required: true
+                    },
+                    endDate: {
+                        required: true,
+                        greaterThan: "#id_startDate"
+
+                    }
+                    }
+                });
+
+        </script>
+
+
+{% endblock page_js %}

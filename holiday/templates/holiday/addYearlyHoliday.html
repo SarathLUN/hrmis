@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Yearly Holiday {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3>Yearly Holidays</h3>
+
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+                <button class="btn btn-info pull-right" id="custom_add_btn_id">Add New</button>
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                 <div style="height: 20px;">
+                                    <h3 style="color: #aa1737; text-align: center;" id="custom_message_id"></h3>
+                                </div>
+                                <form class="form-horizontal" action="{% url 'holiday:addYearlyHolidayPerfomed' %}" method="post" id="id_dept_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Name</label>
+                                                <div class="col-md-8">
+                                                    <input required type="text" class="form-control" placeholder="Holiday Name/Title" name="name" id="id_name">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">From</label>
+                                                <div class="col-md-8">
+                                                    <input required type="text" class="form-control datepicker" placeholder="Start Date" name="start_date" id="id_startDate">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">To</label>
+                                                <div class="col-md-8">
+                                                    <input required type="text" class="form-control datepicker" placeholder="End Date" name="end_date" id="id_endDate">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Comments</label>
+                                                <div class="col-md-8">
+                                                    <textarea class="form-control" rows="2" name="comments"></textarea>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="panel-footer">
+
+                                            <button class="btn btn-primary pull-right" id="btn_save">Save <span class="fa fa-floppy-o fa-right"></span></button>
+                                        </div>
+
+                                    </div>
+
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3>Holiday</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table dataTable table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Title</th>
+                                        <th>From Date</th>
+                                        <th>To Date</th>
+
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for days in edit_list %}
+                                        <tr id="tr_{{ days.flag }}" class="my_row">
+                                            <td id="tr_{{ days.flag }}_td_1" class="a">{{ forloop.counter}}</td>
+                                            <td id="tr_{{ days.flag }}_td_2" class="b">{{ days.holidayTitle}}</td>
+                                            <td id="tr_{{ days.flag }}_td_3" class="c">{{ days.fromDate}}</td>
+                                            <td id="tr_{{ days.flag }}_td_4" class="d">{{ days.toDate}}</td>
+                                        </tr>
+
+                                    {% endfor %}
+                                </tbody>
+
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addYearlyHoliday.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+
+
+    <script type="text/javascript">
+        jQuery.validator.addMethod("greaterThan",
+            function(value, element, params) {
+
+                if (!/Invalid|NaN/.test(new Date(value))) {
+                    return new Date(value) >= new Date($(params).val());
+                }
+
+                return isNaN(value) && isNaN($(params).val())
+                    || (Number(value) > Number($(params).val()));
+            },'Must be greater or equal.');
+
+        var jvalidate = $("#id_dept_form").validate({
+            ignore: [],
+            rules: {
+
+                name: {
+                    required: true
+
+                },
+                start_date: {
+                    required: true
+
+                },
+                end_date: {
+                    required: true,
+                    greaterThan: "#id_startDate"
+
+                }
+                }
+            });
+
+    </script>
+
+
+{% endblock page_js %}

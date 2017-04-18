@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Weekly Holidays {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3>Weekly Holidays</h3>
+
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4>Present Weekends at {{ weekend_list.last.active_location.locationName }}</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        {% for d in days %}
+                                            {% if d.status == 1 %}
+                                                <label class="check"><input type="checkbox" class="icheckbox" name="dayName" value="{{ d.dayNum }}" checked="checked" disabled/> {{ d.dayname }}</label>
+                                                <br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="panel-footer">
+
+                                        <button class="btn btn-primary pull-right" id="btn_edit">Edit <span class="fa fa-floppy-o fa-right"></span></button>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-8" id="form_div">
+
+                               <form class="form-horizontal" action="{% url 'holiday:addWeeklyHolidayPerfomed' %}" method="post" id="id_dept_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Effective Date</label>
+                                                <div class="col-md-6">
+                                                    <input required type="text" class="form-control datepicker" placeholder="Start Date" name="date" id="id_startDate">
+                                                </div>
+                                                <div class="col-md-3">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Location</label>
+                                                <div class="col-md-7">
+                                                    <select multiple class="form-control select" name="location">
+                                                        {% for list in location_list %}
+                                                            <option value="{{ list.location_id }}">{{ list.locationName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">weekdays</label>
+                                                <div class="col-md-4">
+
+                                                    {% for d in days %}
+                                                        {% if d.status == 1 %}
+                                                            <label class="check"><input type="checkbox" class="icheckbox" name="dayName" value="{{ d.dayNum }}" checked="checked" /> {{ d.dayname }}</label>
+                                                            <br>
+                                                        {% else %}
+                                                            <label class="check"><input type="checkbox" class="icheckbox" name="dayName" value="{{ d.dayNum }}"/> {{ d.dayname }}</label>
+                                                            <br>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="panel-footer">
+
+                                            <button class="btn btn-primary pull-right" id="btn_save">Save <span class="fa fa-floppy-o fa-right"></span></button>
+                                        </div>
+
+                                    </div>
+
+                                </form>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="panel-body">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Location</th>
+                                                <th>Day Name</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {% for list in weekend_list %}
+                                            <tr id="tr_{{ list.id }}" class="my_row">
+                                                <td id="tr_{{ list.id }}_td_1" class="a">{{ forloop.counter }}</td>
+                                                <td id="tr_{{ list.id }}_td_2" class="b">{{ list.active_location.locationName }}</td>
+                                                <td id="tr_{{ list.id }}_td_3" class="c">{{ list.dayName }}</td>
+
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addWeeklyHoliday.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+
+{% endblock page_js %}

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Menu {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Add New Menu</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height: 20px;">
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ message }}</h3>
+                </div>
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12" id="">
+                                <form class="form-horizontal" action="{% url 'account:add_new_menu' %}" method="post" id="id_add_new_menu_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Menu Title</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control" placeholder="Enter Menu title" name="menu_title" id="id_menu_title">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">URL Link</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control" placeholder="Enter URL link" name="url_link" id="id_url_link">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">User Group</label>
+                                                <div class="col-md-7">
+                                                    <select multiple class="form-control select" name="groups">
+                                                        {% for group in active_group_list %}
+                                                            <option value="{{ group.id }}">{{ group.group_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Parent</label>
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="checkbox" name="parent_check" id="id_parent_check" value="" class="icheckbox_minimal-grey"/> root</label>
+                                                </div>
+                                                <div class="col-md-5 parent">
+                                                    <select class="form-control js-example-basic-single" name="parent_name" id="id_parent_name" >
+                                                        <option value="">Select</option>
+                                                        {% for list in menu_list %}
+                                                            <option value="{{ list.id }}" >{{ list.menu_string }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right"  id="btn_save">Save</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                {% if menu_group_list %}
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Menu List</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover table-bordered" id="result_table" style="">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Menu Name</th>
+                                                    <th>Parent</th>
+                                                    <th>Privileged Group</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for list in menu_group_list %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td id="tr_td_1_{{ list.id }}" class="a">{{ list.menu_id.menu_string }}</td>
+                                                    {% if list.menu_id.parent_id %}
+                                                    <td id="tr_td_2_{{ list.id }}" class="b">{{ list.menu_id.parent_id.menu_string }}</td>
+                                                    {% else %}
+                                                    <td id="tr_td_2_{{ list.id }}" class="b" style="color: brown">Root</td>
+                                                    {% endif %}
+                                                    <td id="tr_td_3_{{ list.id }}" class="c" >{{ list.menu_group_id.group_name }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/icheck/icheck.min.js' %}"></script>
+
+
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addMenu.js' %}"></script>
+{% endblock page_js %}

@@ -1,0 +1,53 @@
+
+    <div id="myModal" class="reveal-modal" >
+        <h2>Count Down Begins!</h2>
+        <h1>Happy New Year !</h1>
+        <a class="close-reveal-modal">&#215;</a>
+    </div> 
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
+    <script type="text/javascript" src="http://tools.mybloggertricks.com/mbt-popup.js"></script>
+    <script type='text/javascript' src="http://tools.mybloggertricks.com/mbt-counter.js"></script>
+    <script type='text/javascript'>
+        //<![CDATA[
+
+        //Setting Time
+        TargetDate = "12/25/2016 12:00 AM";
+        CountActive = true;
+        CountStepper = -1;
+        LeadingZero = true;
+        DisplayFormat = "%%D%% days: %%H%% hrs: %%M%% mins: %%S%% secs";
+        FinishMessage = "It is finally here!";
+
+        //Hiding snowfall
+        $(document).ready(function() {
+            $('a.close-reveal-modal').click(function() {$(document).snowfall('clear');});
+
+            //Setting cookie
+            if(sessionStorage.getItem("Hide-MBT-Popup") > 10) {
+            $(document).snowfall('clear');
+            $(document).snowfall.hide();
+            $("#myModal").hide();
+
+            }
+            sessionStorage.setItem("Hide-MBT-Popup", 10);
+
+            });
+
+                    $(function() {
+
+        // Setting Animation
+         $('#myModal').reveal({
+             animation: 'fadeAndPop',                   //fade, fadeAndPop, none
+             animationspeed: 300,                       //how fast animtions are
+             closeonbackgroundclick: false,              //if you click background will modal close?
+             dismissmodalclass: 'close-reveal-modal'    //the class of a button or element that will close an open modal
+        });
+
+        //Revealing Snowfall
+        $(document).snowfall({deviceorientation : true, round : true, minSize: 1, maxSize:8,  flakeCount : 250});
+
+        });
+
+        //]]>
+    </script>

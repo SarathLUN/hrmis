@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Employee {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Edit Employee</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li>
+                <a href="{% url 'hr:viewEmployeeList' 'list' %}" class="pull-right">
+                    <button class="btn btn-info pull-right" id="">
+                        <span class="fa fa-chevron-circle-left"></span>
+                        Return
+                    </button>
+                </a>
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form class="form-horizontal" action="{% url 'hr:editEmployeePerfomed' employee.employee_id %}" method="post">
+        <div class="panel panel-default">
+            {% csrf_token %}
+            <div class="panel-body">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Name</label>
+                            <div class="col-md-3">
+                                <select class="form-control select" name="title">
+                                    <option value="{{ employee.gender }}">{{ employee.get_gender_display }}</option>
+                                    <option value="1">Mr.</option>
+                                    <option value="2">Ms.</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="employeeName" value="{{ employee.employeeName }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Emp. Code</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="employeeCode" value="{{ employee.employeeCode }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">D.O.B</label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                    <input required type="text" class="form-control datepicker" name="dateOfBirth" value="{{ employee.dateOfBirth }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Blood Group</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="bloodGroup" value="{{ employee.bloodGroup }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Father Name</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="fatherName" value="{{ employee.fatherName }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">National Id.</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="nationalId" value="{{ employee.nationalId }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Bank Name</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="bankName" value="{{ employee.bankName }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Email</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="email" value="{{ employee.email }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Present Address</label>
+                            <div class="col-md-9 col-xs-12">
+                                <textarea class="form-control" rows="4" name="presentAddress" >{{ employee.presentAddress }}</textarea>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Mobile</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="mobile" value="{{ employee.mobile }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Card Id</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="cardId" value="{{ employee.cardId }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Join Date</label>
+                            <div class="col-md-9">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                                    <input type="text" class="form-control datepicker" value="{{ employee.joiningDate }}" name="joiningDate">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Country</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="nationality" value="{{ employee.nationality }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Mother Name</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="motherName" value="{{ employee.motherName }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Passport Id.</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="passportId" value="{{ employee.passportId }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Account No.</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" name="bankAccountNo" value="{{ employee.bankAccountNo }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-9">
+                                <br>
+                                <br>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Permanent Address</label>
+                            <div class="col-md-9 col-xs-12">
+                                <textarea class="form-control" rows="4" name="permanentAddress">{{ employee.permanentAddress }}</textarea>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="panel-footer">
+                <button class="btn btn-primary pull-right">Update</button>
+            </div>
+        </div>
+    </form>
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addDepartment.js' %}"></script>
+{% endblock page_js %}

@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Attendance Report {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Attendance List</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ obj.employeeName }}</h3>
+                                </div>
+
+                               <form class="form-horizontal" action="{% url 'attendance:getEmployeeAttendace' %}" method="post" id="id_attendance_search_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Department</label>
+                                            <div class="col-md-5">
+                                                <select class="form-control js-example-basic-single" name="department" id="id_department">
+                                                    <option value="">Select</option>
+                                                    {% for dept in department_list %}
+                                                        <option value="{{ dept.department_id }}" >{{ dept.departmentName }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Employee</label>
+                                            <div class="col-md-5">
+                                                <select class="form-control js-example-basic-single" name="employee" id="id_employee" required>
+                                                    <option value="">Select</option>
+                                                    {% for emp in employee_list %}
+                                                        <option value="{{ emp.employee_id }}" >{{ emp.employeeName }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="check"><input type="checkbox" name="all_employee" id="id_all_employee" value="all" class="icheckbox_minimal-grey"/> All Employee</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Date Range</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control datepicker" placeholder="End Date" name="endDate" id="id_endDate">
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+                                </form>
+
+                                {% if attendance_list %}
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3 id="custom_panel_heading_id">List</h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="printBtn">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="panel-body"  id="dvContents">
+                                        <div class="row">
+                                        <div class="col-xs-6" style="">
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Name</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.employee_id.employeeName }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Department</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.department_id.departmentName }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Designation</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.des_id.designation }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Duration</label>
+                                                <label class="col-xs-8 control-label">: {{ start_date|date:"M d, Y" }} -- {{ end_date|date:"M d, Y" }}</label>
+
+                                            </div>
+
+                                        </div>
+                                        <div class=" col-xs-4" style="">
+
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Total</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Total }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Present</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Present }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Absent</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Absent }}</label>
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Leave</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Leave }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Late</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Late }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">I/R</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.I_R }}</label>
+
+                                            </div>
+                                            {% if count_list.count_attendance_in_holiday != 0 %}
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Weekend Work</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.count_attendance_in_holiday }}</label>
+
+                                            </div>
+                                            {% endif %}
+                                            <hr>
+                                        </div>
+
+                                        </div>
+                                        <br><br>
+                                        <table class="table table-responsive table-st dataTable table-hover " style="font-size: 12px; ">
+                                            <caption style="text-align: center;"><h3>Attendance Report</h3></caption>
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>In Time</th>
+                                                    <th>Out Time</th>
+                                                    <th>Status</th>
+                                                    <th>Remarks</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in attendance_list %}
+                                                    {% if list.attendance_in_holiday %}
+                                                    <tr id="tr_{{ list.id}}" class="my_row danger">
+                                                        <td id="tr_{{ list.id }}_td_4" class="d">{{ list.date|date:"M d, y" }}</td>
+                                                        <td id="tr_{{ list.id }}_td_5" class="e">{{ list.in_time }}</td>
+                                                        <td id="tr_{{ list.id }}_td_6" class="f">{{ list.out_time }}</td>
+                                                        <td id="tr_{{ list.id }}_td_8" class="g">{% autoescape off %}{{ list.status }}{% endautoescape %}</td>
+                                                        {% if list.endorsement|slice:"0:8" == 'Endorsed' %}
+                                                            <td id="tr_{{ list.id }}_td_9" class="h" data-toggle="tooltip" data-placement="top" title="{{ list.late_message }}"><a>{{ list.endorsement|slice:"0:8" }}</a>{{ list.endorsement|slice:"8:" }}</td>
+                                                        {% else %}
+                                                            <td id="tr_{{ list.id }}_td_9" class="h">{{ list.endorsement }}</td>
+                                                        {% endif %}
+                                                      <!--  <td><a href="#" data-toggle="modal" data-target="#modal_basic">Details</a></td> -->
+
+                                                    </tr>
+                                                    {% else %}
+                                                    <tr id="tr_{{ list.id}}" class="my_row">
+                                                        <td id="tr_{{ list.id }}_td_4" class="d">{{ list.date|date:"M d, y" }}</td>
+                                                        <td id="tr_{{ list.id }}_td_5" class="e">{{ list.in_time }}</td>
+                                                        <td id="tr_{{ list.id }}_td_6" class="f">{{ list.out_time }}</td>
+                                                        <td id="tr_{{ list.id }}_td_8" class="g">{% autoescape off %}{{ list.status }}{% endautoescape %}</td>
+                                                        {% if list.endorsement|slice:"0:8" == 'Endorsed' %}
+                                                            <td id="tr_{{ list.id }}_td_9" class="h" data-toggle="tooltip" data-placement="top" title="{{ list.late_message }}"><a>{{ list.endorsement|slice:"0:8" }}</a>{{ list.endorsement|slice:"8:" }}</td>
+                                                        {% else %}
+                                                            <td id="tr_{{ list.id }}_td_9" class="h">{{ list.endorsement }}</td>
+                                                        {% endif %}
+                                                      <!--  <td><a href="#" data-toggle="modal" data-target="#modal_basic">Details</a></td> -->
+
+                                                    </tr>
+                                                    {% endif %}
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                {% elif dept_attendance_list %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3 id="custom_panel_heading_id2">List</h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="printBtn2">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="panel-body"  id="dvContents2">
+                                        <div class="panel panel-default" style="">
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">Department:</label>
+                                                <label class="col-md-10 control-label">{{ employee_dept }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">From</label>
+                                                <label class="col-md-3 control-label">{{ start_date|date }}</label>
+                                                <label class="col-md-1 control-label">to</label>
+                                                <label class="col-md-3 control-label">{{ end_date|date }}</label>
+                                            </div>
+
+                                        </div>
+                                        <table class="table table-responsive table-st dataTable table-hover" style="font-size: 12px; ">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Designation</th>
+                                                    <th>Date</th>
+                                                    <th>In Time</th>
+                                                    <th>Out Time</th>
+                                                    <th>Status</th>
+                                                    <th>Remarks</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in dept_attendance_list %}
+                                                    {% if list.attendance_in_holiday %}
+                                                    <tr id="" class="my_row danger">
+                                                    {% ifchanged list.name %}
+                                                        <td class="b">{{ list.name }}</td>
+                                                    {% else %}
+                                                        <td class="b"></td>
+                                                    {% endifchanged %}
+                                                    {% ifchanged list.name %}
+                                                        <td class="b">{{ list.designation }}</td>
+                                                    {% else %}
+                                                        <td class="b"></td>
+                                                    {% endifchanged %}
+                                                        <td class="d">{{ list.date }}</td>
+                                                        <td class="e">{{ list.in_time }}</td>
+                                                        <td class="f">{{ list.out_time }}</td>
+                                                        <td class="g">{% autoescape off%}{{ list.status }} {% endautoescape %}</td>
+                                                        {% if list.endorsement|slice:"0:8" == 'Endorsed' %}
+                                                            <td id="tr_{{ list.id }}_td_9" class="h" data-toggle="tooltip" data-placement="top" title="{{ list.late_message }}"><a>{{ list.endorsement|slice:"0:8" }}</a>{{ list.endorsement|slice:"8:" }}</td>
+                                                        {% else %}
+                                                            <td id="tr_{{ list.id }}_td_9" class="h">{{ list.endorsement }}</td>
+                                                        {% endif %}
+                                                    </tr>
+                                                    {% else %}
+                                                    <tr id="" class="my_row">
+                                                        {% ifchanged list.name %}
+                                                        <td class="b">{{ list.name }}</td>
+                                                        {% else %}
+                                                            <td class="b"></td>
+                                                        {% endifchanged %}
+                                                        {% ifchanged list.name %}
+                                                            <td class="b">{{ list.designation }}</td>
+                                                        {% else %}
+                                                            <td class="b"></td>
+                                                        {% endifchanged %}
+                                                        <td class="d">{{ list.date }}</td>
+                                                        <td class="e">{{ list.in_time }}</td>
+                                                        <td class="f">{{ list.out_time }}</td>
+                                                        <td class="g">{% autoescape off%}{{ list.status }} {% endautoescape %}</td>
+                                                        {% if list.endorsement|slice:"0:8" == 'Endorsed' %}
+                                                            <td id="tr_{{ list.id }}_td_9" class="h" data-toggle="tooltip" data-placement="top" title="{{ list.late_message }}"><a>{{ list.endorsement|slice:"0:8" }}</a>{{ list.endorsement|slice:"8:" }}</td>
+                                                        {% else %}
+                                                            <td id="tr_{{ list.id }}_td_9" class="h">{{ list.endorsement }}</td>
+                                                        {% endif %}
+                                                    </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            {% endif %}
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="modal_basic" tabindex="-1" role="dialog" aria-labelledby="defModalHead" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="form-horizontal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="defModalHead">Late Notification</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Department</label>
+                            <div class="col-md-5">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Employee</label>
+                            <div class="col-md-5">
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Date Range</label>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate" data-date-format="" value="">
+                            </div>
+
+                        </div>
+
+                        <div class="panel-footer">
+                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+{#    <script type="text/javascript" src="{% static 'attendance/js/plugins/jquery/jquery-2.2.3.js' %}"></script>#}
+    <script async  type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script async  type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+    <script async  type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+    <script async  type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+    <script async  type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script async  type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+
+    <script async  type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script async  type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+    <script async  type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+    <script async  type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+
+
+    <script type="text/javascript">
+
+        jQuery.validator.addMethod("greaterThan",
+            function(value, element, params) {
+
+                if (!/Invalid|NaN/.test(new Date(value))) {
+                    return new Date(value) >= new Date($(params).val());
+                }
+
+                return isNaN(value) && isNaN($(params).val())
+                    || (Number(value) > Number($(params).val()));
+            },'Must be greater or equal.');
+
+
+            var jvalidate = $("#id_attendance_search_form").validate({
+                ignore: [],
+                rules: {
+
+                    department: {
+                        required: true
+
+                    },
+                    employee: {
+                        required: true
+
+                    },
+                    startDate: {
+                        required: true
+                    },
+                    endDate: {
+                        required: true,
+                        greaterThan: "#id_startDate"
+
+                    }
+                    }
+                });
+
+        </script>
+
+        <script async  type="text/javascript" src="{% static 'attendance/js/page_customJS/page_getAttendanceHistory.js' %}"></script>
+
+
+{% endblock page_js %}

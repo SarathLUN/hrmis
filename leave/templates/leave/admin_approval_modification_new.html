@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}All SMS List {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h2 id="custom_panel_heading_id">Approval List</h2>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+                <select class="form-control select" name="type" id="id_type">
+                    <option value="1">Leave</option>
+                    <option value="2">Attendance</option>
+                </select>
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height: 20px;">
+                    {% if error_message %}
+                        <div style="height: 20px; text-align: center">
+                            <h3 style="color: #aa1737" id="">{{ error_message }}</h3>
+                        </div>
+                    {% endif %}
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div class="block">
+
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form class="form-horizontal" action="{% url 'attendance:get_own_attendance' %}" method="post" id="id_attendance_search_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+
+                                        {% if child_list %}
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Select</label>
+                                            <div class="col-md-2">
+                                                <label class="check"><input type="checkbox" name="own_report" id="id_own_report" value="-99" class="icheckbox_minimal-grey"/> Own Report</label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select class="form-control " name="child_emp_id" id="id_child_emp_id" required>
+                                                    <option value="">Select</option>
+                                                    {% for list in child_list %}
+                                                        <option value="{{ list.child_employee.employee_id }}" >{{ list.child_employee.employeeName }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+                                        {% endif %}
+
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Date Range</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control datepicker" placeholder="End Date" name="endDate" id="id_endDate">
+                                            </div>
+
+                                        </div>
+
+
+                                        <!--
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Date Range</label>
+                                            <div class="col-md-7">
+                                                <div id="reportrange" class="dtrange">
+                                                <span></span><b class="caret"></b>
+                                                </div>
+                                                <input type="hidden" value="" id="id_hidden_date_range" name="hidden_date_range"/>
+                                            </div>
+
+                                        </div>
+                                        -->
+
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+                                </form>
+                                {% if active_leave_list %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Pending Leave Application for Approval</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table table-bordered table-responsive table-hover" style="table-layout: fixed;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Applied by</th>
+                                                    <th>Leave Type</th>
+                                                    <th>Applied To</th>
+                                                    <th>Reason</th>
+                                                    <th>From Date</th>
+                                                    <th>To Date</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in active_leave_list %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ list.employee_id.employeeName }}</td>
+                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.type.name }}</td>
+                                                    <td id="tr_{{ list.id }}_td_7">{{ list.endorsed_by.employeeName }}</td>
+                                                    <td id="tr_{{ list.id }}_td_3" class="c">{{ list.description }}</td>
+                                                    <td id="tr_{{ list.id }}_td_4" class="d">{{ list.date_from }}</td>
+                                                    <td id="tr_{{ list.id }}_td_5" class="e">{{ list.date_to }}</td>
+                                                    {% if list.endorsement == '0' %}
+                                                        <td id="tr_{{ list.id }}_td_6" class="f"><span class="label label-primary">{{ list.get_endorsement_display }}</span></td>
+                                                    {% elif list.endorsement == '1' %}
+                                                        <td id="tr_{{ list.id }}_td_6" class="f"><span class="label label-warning">{{ list.get_endorsement_display }}</span></td>
+                                                    {% elif list.endorsement == '2' %}
+                                                        <td id="tr_{{ list.id }}_td_6" class="f"><span class="label label-danger">{{ list.get_endorsement_display }}</span></td>
+                                                    {% elif list.endorsement == '3' %}
+                                                        <td id="tr_{{ list.id }}_td_6" class="f"><span class="label label-success">{{ list.get_endorsement_display }}</span></td>
+                                                    {% endif %}
+                                                    <td id="tr_{{ list.id }}_td_7" class="g">
+                                                        <a href="{% url 'leave:admin_leave_req_edit' list.id 'reverse' %}">Roll Back</a>
+                                                        /
+                                                        <a href="{% url 'leave:admin_leave_req_edit' list.id 'delete' %}">Delete</a>
+
+                                                    </td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% if active_sms_list %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Pending Attendance Application for Approval</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table table-hover table-bordered" style="table-layout: fixed">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Time</th>
+                                                    <th>Applied by</th>
+                                                    <th>SMS text</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in active_sms_list %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ list.date.date|date:"M d, Y" }}</td>
+                                                    <td id="tr_{{ list.id }}_td_1" class="g">{{ list.date.time }}</td>
+                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.emp_id.employeeName }}</td>
+                                                    <td id="tr_{{ list.id }}_td_7">{{ list.sms_text }}</td>
+                                                    {% if list.isEndorsed == '0' %}
+                                                        <td id="tr_{{ list.id }}_td_3" class="c"><span class="label label-primary">{{ list.get_isEndorsed_display}}</span></td>
+                                                    {% elif list.isEndorsed == '1' %}
+                                                        <td id="tr_{{ list.id }}_td_3" class="c"><span class="label label-warning">{{ list.get_isEndorsed_display}}</span></td>
+                                                    {% elif list.isEndorsed == '3' %}
+                                                        <td id="tr_{{ list.id }}_td_3" class="c"><span class="label label-warning">{{ list.get_isEndorsed_display}}</span></td>
+                                                    {% else %}
+                                                        <td id="tr_{{ list.id }}_td_3" class="c"><span class="label label-danger">{{ list.get_isEndorsed_display}}</span></td>
+                                                    {% endif %}
+
+                                                    <td id="tr_{{ list.id }}_td_6" class="f">
+                                                        <a href="{% url 'leave:admin_sms_attendance_edit' list.id 'reverse' %}">Roll Back</a>
+                                                        /
+                                                        <a href="{% url 'leave:admin_sms_attendance_edit' list.id 'delete' %}">Delete</a>
+                                                    </td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                                {% else %}
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa; text-align: center" id="custom_message_id">No Application for Approval</h3>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="modal_basic" tabindex="-1" role="dialog" aria-labelledby="defModalHead" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="defModalHead">Basic Modal</h4>
+                </div>
+                <div class="modal-body">
+                    Some content in modal example
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+{% block page_js %}
+    {% load staticfiles %}
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/app_leave/page_admin_leave_page.js' %}"></script>
+{% endblock page_js %}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Department Add {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Add New Department</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li>
+                <button class="btn btn-info pull-right" id="custom_add_btn_id">Add New</button>
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                                </div>
+                                <form class="form-horizontal" action="{% url 'hr:addDepartmentPerfomed' %}" method="post" id="id_dept_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Department Name</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" value="" name="departmentName" id="id_departmentName"/>
+                                                    <span id="custom_name_span_id"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Description</label>
+                                                <div class="col-md-7">
+
+                                                    <textarea class="form-control" id="id_location" name="location"></textarea>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right"  id="btn_save">Add New</button>
+                                        </div>
+                                    </div>
+
+                                </form>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Department Table</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Department Name</th>
+                                                    <th>Description</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for dept in department_list %}
+                                                <tr id="tr_{{ dept.department_id }}" class="my_row">
+                                                    <td id="tr_{{ dept.department_id }}_td_1" class="a">{{ forloop.counter }}</td>
+                                                    <td id="tr_{{ dept.department_id }}_td_2" class="b">{{ dept.departmentName }}</td>
+                                                    <td id="tr_{{ dept.department_id }}_td_3" class="c">{{ dept.description }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addDepartment.js' %}"></script>
+{% endblock page_js %}

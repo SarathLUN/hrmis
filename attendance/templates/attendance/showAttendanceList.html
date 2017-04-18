@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Report {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Attendance List</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                                </div>
+
+                               <form class="form-horizontal" action="{% url 'attendance:showAttedanceList' %}" method="post" id="">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Department</label>
+                                            <div class="col-md-5">
+                                                <select class="form-control select" name="department" id="id_department">
+                                                    <option value="null">Select</option>
+                                                    {% for dept in department_list %}
+                                                        <option value="{{ dept.department_id }}" >{{ dept.departmentName }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Date Range</label>
+                                            <div class="col-md-3">
+                                                <input required type="date" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate" data-date-format="dd-mm-yyyy">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input required type="date" class="form-control datepicker" placeholder="End Date" name="endDate" id="id_endDate" data-date-format="dd-mm-yyyy">
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-floppy-o fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+                                </form>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3 id="custom_panel_heading_id">List</h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="btnPrint">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="panel-body"  id="dvContents">
+                                        <table class="table table-responsive table-st dataTable table-hover table-striped" style="font-size: 12px; ">
+                                            <thead>
+                                                <tr>
+                                                    <th>id</th>
+                                                    <th>Name</th>
+                                                    <th>Card Id</th>
+                                                    <th>Date</th>
+                                                    <th>In Time</th>
+                                                    <th>Out Time</th>
+                                                    <th>login Time</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in temp_attendance_list %}
+                                                <tr id="tr_{{ list.id}}" class="my_row">
+                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ list.id }}</td>
+                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.name }}</td>
+                                                    <td id="tr_{{ list.id }}_td_3" class="c">{{ list.card_id }}</td>
+                                                    <td id="tr_{{ list.id }}_td_4" class="d">{{ list.date }}</td>
+                                                    <td id="tr_{{ list.id }}_td_5" class="e">{{ list.in_time }}</td>
+                                                    <td id="tr_{{ list.id }}_td_6" class="f">{{ list.out_time }}</td>
+                                                    <td id="tr_{{ list.id }}_td_7" class="g">{{ list.login_limit }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3 id="custom_panel_heading_id">List</h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="panel-body"  id="">
+                                        <table class="table dataTable table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Card Id</th>
+                                                    <th>Date</th>
+                                                    <th>Time</th>
+                                                    <th>In/Out</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in attendance_list %}
+                                                <tr id="tr_{{ list.id}}" class="my_row">
+                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ list.name }}</td>
+                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.card_id }}</td>
+                                                    <td id="tr_{{ list.id }}_td_3" class="c">{{ list.date }}</td>
+                                                    <td id="tr_{{ list.id }}_td_4" class="d">{{ list.time }}</td>
+                                                    <td id="tr_{{ list.id }}_td_5" class="e">{{ list.in_out }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_showAttendanceList.js' %}"></script>
+{% endblock page_js %}

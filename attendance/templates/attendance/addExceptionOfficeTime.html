@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Office Time Exception {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Add Officetime Execption</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height: 20px;">
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+
+                            <div class="col-md-12" id="">
+
+                                <form class="form-horizontal" action="{% url 'attendance:addExceptionOfficeTime' %}" method="post" id="id_add_exception_form">
+                                    {% csrf_token %}
+
+                                    <div class="panel panel-default">
+
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Location</label>
+                                                <div class="col-md-7">
+                                                    <select multiple class="form-control select" name="locations" required>
+                                                        {% for list in location_list %}
+                                                            <option value="{{ list.location_id }}">{{ list.locationName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Date</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control datepicker" placeholder="Date" name="date" id="id_date">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Grace Time</label>
+                                                <div class="col-md-5">
+                                                    <input required type="text" class="form-control" value="" id="id_grace_time" name="grace_time"/>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="checkbox" name="time_flexible" id="id_time_flexible" value="-99" class="icheckbox_minimal-grey"/> Time Flexible</label>
+                                                </div>
+
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Reason</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control" placeholder="Write Delay Reason" name="reason" id="reason">
+                                                    <span class="help-block">Required, max size = 20 Characters</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-xs-12 control-label">Description</label>
+                                                <div class="col-md-7 col-xs-12">
+                                                    <textarea class="form-control" rows="3" name="description" id="description"></textarea>
+                                                    <span class="help-block"></span>
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right"  id="btn_save">Save</button>
+                                        </div>
+                                    </div>
+
+                                </form>
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Current Year Exception List</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Date</th>
+                                                    <th>Location</th>
+                                                    <th>Additional Time</th>
+                                                    <th>Reason</th>
+                                                    <th>Description</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in exception_list %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ forloop.counter }}</td>
+                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.date }}</td>
+                                                    <td id="tr_{{ list.id }}_td_6" class="b">{{ list.location_id }}</td>
+                                                    {% if list.grace_time != -99 %}
+                                                    <td id="tr_{{ list.id }}_td_3" class="c">{{ list.grace_time }} minute(s)</td>
+                                                    {% else %}
+                                                    <td id="tr_{{ list.id }}_td_3" class="c">Time Flexible</td>
+                                                    {% endif %}
+                                                    <td id="tr_{{ list.id }}_td_4" class="d">{{ list.cause }}</td>
+                                                    <td id="tr_{{ list.id }}_td_5" class="e">{{ list.description }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+    <script type='text/javascript' src={% static 'attendance/js/plugins/icheck/icheck.min.js' %}></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_addException.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+
+    <script type="text/javascript">
+
+        var jvalidate = $("#id_add_exception_form").validate({
+            ignore: [],
+            rules: {
+
+                reason: {
+                    required: true,
+                    maxlength: 20
+                },
+                date: {
+                    required: true
+                }
+                }
+            });
+
+    </script>
+
+{% endblock page_js %}

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee List {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">View Employee List</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Employee Table</h3>
+                                        <div class="btn-group pull-right">
+                                          <!--  <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Data</button>
+                                            <ul class="dropdown-menu">
+
+                                                <li class="divider"></li>
+                                                {% load staticfiles %}
+                                                <li><a href="#" onClick ="$('#customers2').tableExport({type:'csv',escape:'false'});"><img src="{% static 'attendance/img/icons/csv.png' %}" width="24"/> CSV</a></li>
+                                                <li class="divider"></li>
+                                                <li><a href="#" onClick ="$('#customers2').tableExport({type:'excel',escape:'false'});"><img src="{% static 'attendance/img/icons/xls.png' %}" width="24"/> XLS</a></li>
+                                                <li><a href="#" onClick ="$('#customers2').tableExport({type:'pdf',escape:'false',pdfFontSize:'10px'});"><img src="{% static 'attendance/img/icons/pdf.png' %}" width="24"/> PDF</a></li>
+                                            </ul>
+                                            -->
+                                        </div>
+
+                                    </div>
+                                    <div class="panel-body">
+                                        <table id="customers2" class="table datatable">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Card Id</th>
+                                                    <th>Department</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for emp in row %}
+                                                    <tr id="tr_{{ emp.0 }}" class="">
+                                                        <td id="tr_{{ emp.0 }}_td_1" class="a">{{ forloop.counter }}</td>
+                                                        <td id="tr_{{ emp.0 }}_td_2" class="b"><a href="{% url 'hr:editEmployee' emp.0 %}">{{ emp.1 }}</a></td>
+                                                        <td id="tr_{{ emp.0 }}_td_3" class="c">{{ emp.2 }}</td>
+                                                        <td id="tr_{{ emp.0 }}_td_4" class="d">{{ emp.3 }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_employeeList.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/icheck/icheck.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tableexport/tableExport.js' %}"></script>
+	<script type="text/javascript" src="{% static 'attendance/js/plugins/tableexport/jquery.base64.js' %}"></script>
+	<script type="text/javascript" src="{% static 'attendance/js/plugins/tableexport/html2canvas.js' %}"></script>
+	<script type="text/javascript" src="{% static 'attendance/js/plugins/tableexport/jspdf/libs/sprintf.js' %}"></script>
+	<script type="text/javascript" src="{% static 'attendance/js/plugins/tableexport/jspdf/jspdf.js' %}"></script>
+	<script type="text/javascript" src="{% static 'attendance/js/plugins/tableexport/jspdf/libs/base64.js' %}"></script>
+
+{% endblock page_js %}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+      {% load staticfiles %}
+    <link rel="icon" type="image/ico" href="{% static 'attendance/img/favicon (2).ico' %}">
+    <title>Attendence Management login screen</title>
+      {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'start/css/style.css' %}">
+    <style type="text/css">
+    	body{
+    		
+    	}
+
+    </style>
+
+
+  </head>
+
+  <body style="background-color: #173226; width: 100%; height: 100%; position: fixed;">
+    <!-- new year start
+    <div id="myModal" class="reveal-modal" >
+
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+
+    new year end -->
+
+    <div>
+    <div class="wrapper" style="width:50%; margin-left: 40%;">
+
+		<div class="container" style="">
+
+			<h1 style="padding-left: 150px;">Welcome</h1>
+            {% if error %}
+                <p style="padding-left: 200px; color: #aa8d1a;">{{ error }}</p>
+            {% endif %}
+            {% if authenticated %}
+                <p>{{ username }}</p>
+            {% endif %}
+			<div class="row">
+				<div class="col-md-6">
+					<form class="form" action="{% url 'start' %}" method="post">
+
+                        {% csrf_token %}
+
+						<table>
+							<tr>
+								<td rowspan="3"><img src="{% static 'attendance/img/LamSys-logo-trail_3.png' %}" style="padding-left: 30px;"></td>
+								<td><br></td>
+								<td style="padding-left: 50px;">
+									<input type="text" placeholder="Username" name="username">
+									<input type="password" placeholder="Password" name="password">
+									<button type="submit" id="">Login</button>
+								</td>
+							</tr>
+						</table>
+
+						
+					</form>
+				</div>
+			</div>
+		</div>
+	
+
+	</div>
+    <ul class="bg-bubbles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+
+    </ul>
+    </div>
+
+    {% load staticfiles %}
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/jquery/jquery-2.2.3.js' %}"></script>
+
+    <script src="{% static 'start/js/index.js' %}"></script>
+
+
+    
+  </body>
+</html>

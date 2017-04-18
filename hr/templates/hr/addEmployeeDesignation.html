@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block page_css %}
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href={% static 'sweetalert/sweetalert.css' %}>
+{% endblock page_css %}
+
+{% block title %}Employee Designation Add {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="form_header">Add Employee Designation</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+                <button class="btn btn-info pull-right" id="custom_add_btn_id">Add New</button>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if messages %}
+        <div style="height: 20px; text-align: center;" class="messages">
+        {% for message in messages %}
+            <h3 style="color: #aa171e" id="custom_message_id" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h3>
+        {% endfor %}
+        </div>
+    {% endif %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                               <form class="form-horizontal" action="{% url 'hr:addEmployeeDesignantionPerfomed' %}" method="post" id="id_dept_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div class="form-group" id="unassigned_employee">
+                                                <label class="col-md-3 control-label">Employee Name</label>
+                                                <div class="col-md-5">
+                                                    <select class="form-control js-example-basic-single" name="employeeId" id="id_employeeId">
+                                                        <option value="">Select</option>
+                                                        {% for emp in employee_list %}
+                                                            <option value="{{ emp.employee_id }}" >{{ emp.employeeName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-1 input-group date"></div>
+
+                                            </div>
+                                            <div class="form-group" id="assigned_employee">
+                                                <label class="col-md-3 control-label">Employee Name</label>
+                                                <div class="col-md-5">
+                                                    <input required type="text" class="form-control" style="text-align: left; color: black;" value="" placeholder="" name="employeeName" id="id_employeeName" disabled>
+                                                    <input type="hidden" value="" id="hidden_emp_id" name="hidden_emp_id"/>
+                                                </div>
+                                                <div class="col-md-1 input-group date"></div>
+
+                                            </div>
+                                            <div class="form-group" id="test">
+                                                <label class="col-md-3 control-label">Department</label>
+                                                <div class="col-md-5">
+                                                    <select class="form-control js-example-basic-single" name="departmentId" id="id_departmentId">
+                                                        <option value="">Select</option>
+                                                        {% for dept in department_list %}
+                                                            <option value="{{ dept.department_id }}">{{ dept.departmentName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Designation</label>
+                                                <div class="col-md-5">
+                                                    <select class="form-control js-example-basic-single" name="designationId" id="id_designationId" required>
+                                                        <option value="">Select</option>
+                                                        {% for des in designation_list %}
+                                                            <option value="{{ des.des_id }}" >{{ des.designation }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Location</label>
+                                                <div class="col-md-5">
+                                                    <select class="form-control js-example-basic-single" name="locationId" id="id_location" required>
+                                                        <option value="">Select</option>
+                                                        {% for loc in location_list %}
+                                                            <option value="{{ loc.location_id }}" >{{ loc.locationName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Supervisor</label>
+                                                <div class="col-md-5">
+                                                    <select class="form-control js-example-basic-single" name="supervisor" id="id_supervisor" required>
+                                                        <option value="">Select</option>
+                                                        {% for sup in supervisor_list %}
+                                                            <option value="{{ sup.employee_id }}" >{{ sup.employeeName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Effective Date</label>
+                                                <div class="col-md-5">
+                                                    <input required type="text" class="form-control datepicker" value="{% now 'Y/m/d' %}" placeholder="Effective start Date" name="date" id="id_startDate">
+                                                </div>
+                                            </div>
+
+                                           <!-- <div class="form-group">
+                                                <label class="col-md-3 control-label">Effective End Date</label>
+                                                <div class="col-md-5">
+                                                    <input required type="text" class="form-control datepicker" value="" placeholder="Effective End Date" name="end_date" id="id_endDate">
+                                                </div>
+                                            </div>
+                                            -->
+
+                                            <div class="form-group" id="id_justification">
+                                                <label class="col-md-3 control-label">Justification</label>
+                                                <div class="col-md-5">
+                                                    <select class="form-control js-example-basic-single" name="reason" id="id_reason" required>
+                                                        <option value="new" selected>New</option>
+                                                        <option value="left">Left</option>
+                                                        <option value="terminated">Terminated</option>
+                                                        <option value="promoted">Promoted</option>
+                                                        <option value="changed">Changed</option>
+                                                        <option value="transferred">Transferred</option>
+
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right" id="btn_save">Save <span class="fa fa-floppy-o fa-right"></span></button>
+                                        </div>
+
+                                    </div>
+
+                                </form>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3>Employee Table</h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="emp_list_print_btn">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="panel-body" id="dvContents">
+                                        <table class="table dataTable table-hover table-bordered search-table" style="font-size: 11px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Department</th>
+                                                    <th>Designation</th>
+                                                    <th>Location</th>
+                                                    <th>Effective Date</th>
+                                                    <th>Supervisor</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for des in emp_des_list %}
+                                                <tr id="tr_{{ des.emp_des_id }}" class="my_row">
+                                                    <td id="tr_{{ des.emp_des_id }}_td_1" class="a">{{ forloop.counter }}</td>
+                                                    <td id="tr_{{ des.emp_des_id }}_td_2" class="b"><a href="#">{{ des.employee_id }}</a><input type="hidden" value="{{ des.employee_id_id }}" id="hidden_tr_{{ des.emp_des_id }}"/></td>
+                                                    <td id="tr_{{ des.emp_des_id }}_td_3" class="c">{{ des.department_id }}</td>
+                                                    <td id="tr_{{ des.emp_des_id }}_td_4" class="d">{{ des.des_id }}</td>
+                                                    <td id="tr_{{ des.emp_des_id }}_td_5" class="e">{{ des.location_id }}</td>
+                                                    <td id="tr_{{ des.emp_des_id }}_td_6" class="f">{{ des.effective_date_start }}</td>
+                                                    <td id="td_{{ des.emp_des_id }}_td_7" class="g">{{ des.supervisor }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+
+
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/app_hr/page_addEmployeeDesignation.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/readOnly.js' %}"></script>
+        <script type="text/javascript" src="{%  static 'attendance/js/additonal_js/html-table-search.js' %}"></script>
+        <script type="text/javascript" src="{%  static 'sweetalert/sweetalert.min.js' %}"></script>
+        <!--<script type="text/javascript">
+			$(document).ready(function(){
+				$('table.search-table').tableSearch({
+					searchText:'',
+					searchPlaceHolder:'Search here...'
+				});
+			});
+		</script>
+		-->
+
+{% endblock page_js %}

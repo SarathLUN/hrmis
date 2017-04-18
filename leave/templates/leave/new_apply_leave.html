@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- META SECTION -->
+    {% load staticfiles %}
+    <link rel="icon" type="image/ico" href="{% static 'attendance/img/favicon (2).ico' %}">
+    <title>Apply Leave</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {% load staticfiles %}
+    <!-- CSS INCLUDE -->
+    <link rel="stylesheet" type="text/css" id="theme" href="{% static 'attendance/css/theme-blue.css' %}"/>
+    <link rel="stylesheet" type="text/css" href={% static 'attendance/css/jquery/jquery-ui.min.css' %}>
+    <link rel="stylesheet" type="text/css" href="{% static 'attendance/css/select2.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'sweetalert/sweetalert.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'new_year_widget/new_year_counter.css' %}">
+
+    <!-- EOF CSS INCLUDE -->
+
+     <style type="text/css">
+
+        @media screen {
+            #printSection {
+                display: none;
+            }
+        }
+        @media print {
+            body * {
+                visibility:hidden;
+            }
+            #printSection, #printSection * {
+                visibility:visible;
+            }
+            #printSection {
+                position:absolute;
+                left:0;
+                top:0;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- MODALS -->
+    <div class="modal" id="modal_large" tabindex="-1" role="dialog" aria-labelledby="largeModalHead" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="form-horizontal">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="defModalHead">Leave Form</h4>
+                </div>
+                <div class="modal-body" id="printThis">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="block">
+                                <div class="page-content-wrap">
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Employee Name: </label>
+                                        <div class="col-md-4">
+                                            <p class="form-control-static" id="modal_applicant_name">{{ request.user.employeeuser.employee }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Department: </label>
+                                        <div class="col-md-4">
+                                            <p class="form-control-static" id="modal_date"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Designation </label>
+                                        <div class="col-md-4">
+                                            <p class="form-control-static" id="modal_sms_text"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Leave Duration: </label>
+                                        <div class="col-md-3">
+                                            <p class="form-control-static" id="modal_start_date"></p>
+                                        </div>
+                                        <label class="col-md-1 control-label">for </label>
+                                        <label class="col-md-1 control-label" id="modal_days"> </label>
+                                        <div class="col-md-1">
+                                            <p class="form-control-static" id=""> day(s)</p>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">Category of Leave: </label>
+                                        <div class="col-md-4">
+                                            <p class="form-control-static" id="modal_category"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button class="btn btn-success pull-right" id="Print">Print <span class="fa fa-print fa-right"></span></button>
+                    <button type="button" class="btn btn-primary pull-left" data-dismiss="modal" >Close</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-container page-navigation-top-fixed">
+
+        <!-- PAGE SIDEBAR -->
+        {% include 'menuTest.html' %}
+
+        <!-- PAGE CONTENT -->
+        <div class="page-content">
+
+            <!-- START X-NAVIGATION VERTICAL -->
+            <ul class="x-navigation x-navigation-horizontal x-navigation-panel">
+                <!-- TOGGLE NAVIGATION -->
+                <li class="xn-icon-button">
+                    <a href="#" class="x-navigation-minimize"><span class="fa fa-dedent"></span></a>
+                </li>
+                <li class="">
+                    <h2 style="color: #C8A406 ;padding-top: 17px; font-size: 13px;">LEAVE & ATTENDANCE MANAGEMENT SYSTEM</h2>
+                </li>
+                <!--
+                color: #5AD33B
+                -->
+                <!-- END TOGGLE NAVIGATION -->
+                <!-- SEARCH -->
+               <!-- <li class="xn-search">
+                    <form role="form">
+                        <input type="text" name="search" placeholder="Search..."/>
+                    </form>
+                </li>
+                 -->
+                <!-- END SEARCH -->
+                <!-- SIGN OUT -->
+                <li class="xn-icon-button pull-right">
+
+                    <a href="#" class="mb-control" data-box="#mb-signout"><span class="fa fa-sign-out"></span></a>
+                </li>
+                <!-- END SIGN OUT -->
+
+
+                <!-- MESSAGES -->
+               {% block notification %}
+
+                    <!-- MESSAGES -->
+
+                    <li class="xn-icon-button pull-right">
+                        <a href="#"><span class="fa fa-comments"></span></a>
+                        {% if message_count.count > 0 %}
+                        <div class="informer informer-danger">{{ message_count.count }}</div>
+                        <div class="panel panel-primary animated zoomIn xn-drop-left xn-panel-dragging">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><span class="fa fa-comments"></span> Late/SMS Messages</h3>
+                                <div class="pull-right">
+                                    <span class="label label-danger">{{ message_count.count }}  new</span>
+                                </div>
+                            </div>
+                            <div class="panel-body list-group list-group-contacts scroll" style="height: 200px;">
+                                {% for list in message_count %}
+                               <a href="{% url 'attendance:lateAttendance' %}" class="list-group-item">
+                                    <!--<div class="list-group-status status-online"></div> -->
+                                    <img src="{% static 'attendance/img/images.jpg' %}" class="pull-left" alt="Image"/>
+                                    <span class="contacts-title">{{ list.emp_id.employeeName }}</span>
+                                    <p>{{ list.sms_text }}</p>
+                                </a>
+                                {% endfor %}
+
+                            </div>
+                            <div class="panel-footer text-center">
+                                <a href="{% url 'attendance:lateAttendance' %}">Show all messages</a>
+                            </div>
+                        </div>
+
+                        {% else %}
+                            <div class="informer informer-danger"></div>
+                            <div class="panel panel-primary animated zoomIn xn-drop-left xn-panel-dragging">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title"><span class="fa fa-comments"></span> No new Message for approval</h3>
+                                    <div class="pull-right">
+                                        <span class="label label-danger">{{ message_count.count }}  new</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </li>
+
+                    <!-- END MESSAGES -->
+                    <!-- TASKS -->
+
+                    <li class="xn-icon-button pull-right">
+                        <a href="#"><span class="fa fa-tasks"></span></a>
+                        {% if leave_approval_count.count > 0 %}
+
+                        <div class="informer informer-warning">{{ leave_approval_count.count }}</div>
+                        <div class="panel panel-primary animated zoomIn xn-drop-left xn-panel-dragging">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><span class="fa fa-tasks"></span> Leave Notifications</h3>
+                                <div class="pull-right">
+                                    <span class="label label-warning">{{ leave_approval_count.count }} active</span>
+                                </div>
+                            </div>
+                            <div class="panel-body list-group scroll" style="height: 130px;">
+                                {% for list in leave_approval_count %}
+                                <a class="list-group-item" href="{% url 'leave:pendingApplication' %}">
+                                    <strong>{{ list.employee_id.employeeName }}</strong>
+                                    <p>Leave Type:  {{ list.type.name }}</p>
+                                    <small class="text-muted">Applied : {{ list.insertDate }}</small>
+
+
+                                </a>
+                                {% endfor %}
+                            </div>
+                            <div class="panel-footer text-center">
+                                <a href="{% url 'leave:pendingApplication' %}">Show all applications</a>
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <div class="informer informer-warning"></div>
+                        <div class="panel panel-primary animated zoomIn xn-drop-left xn-panel-dragging">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><span class="fa fa-tasks"></span> No new Leave Notifications for approval</h3>
+                                <div class="pull-right">
+                                    <span class="label label-warning">{{ leave_approval_count.count }} active</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </li>
+
+                    <!-- END TASKS -->
+                    {% endblock %}
+            </ul>
+            <!-- END X-NAVIGATION VERTICAL -->
+
+            <!-- START BREADCRUMB -->
+            <ul class="breadcrumb">
+                <li><a href="#">Welcome</a></li>
+                <li class="">{{ request.user.username   }}</li>
+
+            </ul>
+            <!-- END BREADCRUMB -->
+
+            <!-- PAGE CONTENT WRAPPER -->
+            <div class="page-content-wrap">
+
+                <!-- START WIDGETS -->
+                <div class="row">
+
+                    <div class="col-md-3">
+
+                        <!-- START WIDGET CLOCK -->
+                        {% if user.is_authenticated %}
+                            {% if attendance_status == "Late" and endorsement_status != True %}
+                            <div class="widget widget-danger widget-padding-sm blinking">
+                            {% else %}
+                            <div class="widget widget-success widget-padding-sm">
+                            {% endif %}
+                                <div class="widget-big-int">{{ login_time|time }}</div>
+
+                                <div class="widget-controls">
+                                   <!--
+                                    <a href="#" class="widget-control-right widget-remove" data-toggle="tooltip" data-placement="left" title="Remove Widget"><span class="fa fa-times"></span></a>
+                                    -->
+                                </div>
+                                <div class="widget-buttons widget-c3">
+
+                                    <div class="col-md-12">
+                                        <a href="#"><label>OFFICE IN</label></a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        {% endif %}
+                        <!-- END WIDGET CLOCK -->
+
+                            </div>
+
+                        <script>
+                            function blinker() {
+                                $('.blinking').fadeOut(500);
+                                $('.blinking').fadeIn(500);
+                            }
+                            setInterval(blinker, 1000);
+                        </script>
+
+                    <!-- START WIDGET CLOCK -->
+
+                    <div class="col-md-3 col-md-offset-6">
+
+                        <div class="widget widget-primary widget-padding-sm">
+                            <div class="widget-big-int plugin-clock">00:00</div>
+                            <div class="widget-subtitle plugin-date">Loading...</div>
+                        </div>
+
+                    </div>
+                    <!--
+                    <div class="col-md-5 col-md-offset-1" style="padding-right: 0px; margin-right: 0px; padding-left: 92px; background-color: transparent;">
+
+                            <div id="clockdiv" class="" >
+                                <div>
+                                    <span class="days"></span>
+                                    <div class="smalltext">Days</div>
+                                </div>
+                                <div>
+                                    <span class="hours"></span>
+                                    <div class="smalltext">Hours</div>
+                                </div>
+                                <div>
+                                    <span class="minutes"></span>
+                                    <div class="smalltext">Minutes</div>
+                                </div>
+                                <div>
+                                    <span class="seconds"></span>
+                                    <div class="smalltext">Seconds</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-2" style=" background-repeat: no-repeat; padding-left: 0px; margin-left: 0px; background-color: transparent;">
+                           <img src="{% static 'new_year_widget/animated-happy-new-year-image-0044.gif' %}">
+                        </div>
+
+                    -->
+                </div>
+                    <!-- END WIDGETS -->
+
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="panel panel-default">
+                                <div class="panel-heading ">
+                                    <div class="panel-title-box">
+                                        <h3 id="custom_panel_heading_id">Leave Status</h3>
+                                    </div>
+                                    <ul class="panel-controls panel-controls-title">
+                                        <li>
+
+                                        </li>
+                                        <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                    </ul>
+
+                                </div>
+
+                                <div class="panel-body ">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% if error_message %}
+                                                <div style="height: 20px; text-align: center">
+                                                    <h3 style="color: #aa1737; text-align: center;" id="">{{ error_message }}</h3>
+                                                </div>
+                                            {% endif %}
+                                            <div style="height: 20px;">
+                                                <h3 style="color: #aa1737; text-align: center;" id="custom_message_id">{{ form_message }}</h3>
+                                            </div>
+                                            <div class="block">
+                                                <div class="page-content-wrap">
+                                                    <div class="row">
+                                                        <div class="col-md-5">
+                                                            <div class="panel panel-default">
+                                                                <div class="panel-heading">
+                                                                    <h3>Remaining Leave</h3>
+                                                                </div>
+                                                                {% if joining_date_null_error %}
+                                                                    <div class="panel-body">
+                                                                        <h3 style="color: #0077aa; text-align: center" id="custom_message_id">{{ joining_date_null_error }}</h3>
+                                                                    </div>
+                                                                {% else %}
+                                                                <div class="panel-body">
+                                                                    <table class="table dataTable table-hover table-bordered">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Leave Category</th>
+                                                                                <th>Days</th>
+
+                                                                            </tr>
+                                                                        </thead>
+
+                                                                        <tbody>
+                                                                            {% for list in balance_list %}
+                                                                            <tr id="tr_{{ list.id }}" class="my_row">
+                                                                                <td id="tr_{{ list.id }}_td_1" class="a">{{ list.name }}</td>
+                                                                                <td id="tr_{{ list.id }}_td_2" class="b">{{ list.balance }}</td>
+
+                                                                            </tr>
+                                                                        {% endfor %}
+                                                                        </tbody>
+
+                                                                    </table>
+                                                                </div>
+                                                            {% endif %}
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-7" id="">
+
+                                                            <form class="form-horizontal" action="{% url 'leave:applyLeave' 'added' %}" method="post" id="id_apply_leave_form">
+                                                                {% csrf_token %}
+
+                                                                <div class="panel panel-default">
+                                                                    <div class="panel-heading">
+                                                                        <h3>Apply for Leave</h3>
+                                                                    </div>
+                                                                    <div class="panel-body">
+
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-3 control-label">Leave Type</label>
+                                                                            <div class="col-md-7">
+                                                                                <select class="form-control js-example-basic-single" name="type" id="leave_type" required>
+                                                                                    <option value="">Select</option>
+                                                                                    {% for list in balance_list %}
+                                                                                        <option value="{{ list.id }}" >{{ list.name }}</option>
+                                                                                    {% endfor %}
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-3 control-label">From Date</label>
+                                                                            <div class="col-md-7">
+                                                                                <input required type="text" class="form-control datepicker" placeholder="Start Date" name="start_date" id="id_startDate">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-3 control-label">Total</label>
+                                                                            <div class="col-md-7">
+                                                                                <input required type="text" class="form-control" value="" id="id_amount" name="amount" placeholder="Number of Days"/>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-3 control-label">To Date</label>
+                                                                            <div class="col-md-7">
+                                                                                <input required type="text" class="form-control datepicker" style="color:black;" placeholder="End Date" name="end_date" id="id_endDate" disabled>
+                                                                                <input type="hidden" id="id_hidden_to_date" name="hidden_to_date" value="3"/>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {% if permission %}
+
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-3 control-label">Applied to</label>
+                                                                            <div class="col-md-7">
+                                                                                <input type="text" class="form-control" style="color: #000000" value="{{ employee_info.supervisor.employeeName }}" id="id_supervisor" name="supervisor" disabled/>
+                                                                                <input type="hidden" value="0" id="ajax_message" name="hiddhen_confirmed_by"/>
+                                                                                <span id="span_confirmed_by" style="color: #9b0000;"></span>
+                                                                            </div>
+                                                                        </div>
+                                                                        {% endif %}
+
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-3 col-xs-12 control-label">Reason</label>
+                                                                            <div class="col-md-7 col-xs-12">
+                                                                                <textarea class="form-control" rows="3" name="reason" required></textarea>
+                                                                                <span id="span_description" style="color: #9B0000;"></span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    {% if permission %}
+                                                                    <div class="panel-footer">
+                                                                        <button class="btn btn-primary pull-right"  id="btn_save">Apply</button>
+                                                                    </div>
+                                                                    {% else %}
+                                                                    <div class="panel-footer">
+                                                                        <button class="btn btn-primary pull-right"  id="btn_save" disabled>Apply</button>
+                                                                        <br>
+                                                                        <span style="color: #9b0000;">You cannot apply!! No supervisor is Assigned. Contact to <strong> HR department</strong></span>
+                                                                    </div>
+                                                                    {% endif %}
+                                                                </div>
+
+                                                            </form>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="panel panel-default">
+                                                                <div class="panel-heading">
+                                                                    <h3>Current Year Leave Application History</h3>
+                                                                </div>
+                                                                {% if leave_application_history %}
+                                                                    <div class="panel-body">
+                                                                        <table class="table dataTable table-hover table-bordered">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Date Range</th>
+                                                                                    <th>Total</th>
+                                                                                    <th>Category</th>
+                                                                                    <th>Applied To</th>
+                                                                                    <th>Status</th>
+                                                                                    <th>Reason</th>
+                                                                                    <th>Action</th>
+
+                                                                                </tr>
+                                                                            </thead>
+
+                                                                            <tbody>
+                                                                                {% for list in leave_application_history %}
+                                                                                    {% if  list.isActive == 1 %}
+                                                                                        {% if list.endorsement == '0' %}
+                                                                                            <tr id="tr_{{ list.id }}" class="my_row active">
+                                                                                                <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                                                <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                                                <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                                                <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                                                <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                                                <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                                                <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                                                <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                                            </tr>
+                                                                                        {% elif list.endorsement == '1' %}
+                                                                                            <tr id="tr_{{ list.id }}" class="my_row success">
+                                                                                                <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                                                <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                                                <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                                                <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                                                <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                                                <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                                                <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                                                <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                                            </tr>
+
+                                                                                        {% elif list.endorsement == '3' %}
+                                                                                            <tr id="tr_{{ list.id }}" class="my_row info">
+                                                                                                <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                                                <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                                                <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                                                <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                                                <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                                                <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                                                <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                                                <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                                            </tr>
+                                                                                        {% else %}
+                                                                                            <tr id="tr_{{ list.id }}" class="my_row danger">
+                                                                                                <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                                                <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                                                <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                                                <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                                                <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                                                <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                                                <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td>
+                                                                                                <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td> -->
+                                                                                                <td></td>
+                                                                                            </tr>
+                                                                                        {% endif %}
+
+                                                                                    {% else %}
+                                                                                        {% if list.endorsement == '1' %}
+                                                                                            <tr id="tr_{{ list.id }}" class="my_row success">
+                                                                                                <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                                                <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                                                <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                                                <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                                                <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                                                <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                                                <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                                                <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                                            </tr>
+                                                                                        {% elif list.endorsement == '2' %}
+                                                                                            <tr id="tr_{{ list.id }}" class="my_row danger">
+                                                                                                <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                                                <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                                                <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                                                <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                                                <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                                                <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                                                <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td>
+                                                                                                <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td> -->
+                                                                                                <td></td>
+                                                                                            </tr>
+
+                                                                                        {% elif list.endorsement == '3' %}
+                                                                                            <tr id="tr_{{ list.id }}" class="my_row info">
+                                                                                                <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                                                <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                                                <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                                                <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                                                <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                                                <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                                                <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                                                <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                                            </tr>
+                                                                                        {% else %}
+                                                                                            <tr id="tr_{{ list.id }}" class="my_row active">
+                                                                                                <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                                                <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                                                <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                                                <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                                                <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                                                <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                                                <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                                                <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                                            </tr>
+                                                                                        {% endif %}
+                                                                                    {% endif %}
+                                                                            {% endfor %}
+                                                                            </tbody>
+
+                                                                        </table>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div style="height: 20px;">
+                                                                        <h3 style="color: #0077aa; text-align: center" id="custom_message_id">No leave History</h3>
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-2">
+
+                            <!-- START SALES & EVENTS BLOCK -->
+                            <div class="panel panel-default" id="notice_block" style="display: none">
+                                <div class="panel-heading">
+                                    <div class="panel-title-box">
+                                        <h3>Notes</h3>
+                                    </div>
+                                    <ul class="panel-controls" style="margin-top: 2px;">
+                                        <li><a href="#" class="panel-fullscreen"><span class="fa fa-expand"></span></a></li>
+                                       <!-- <li><a href="#" class="panel-refresh"><span class="fa fa-refresh"></span></a></li> -->
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fa fa-cog"></span></a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span> Collapse</a></li>
+                                                <li><a href="#" class="panel-remove"><span class="fa fa-times"></span> Remove</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="panel-body padding-0">
+                                    <div class="chart-holder" id="dashboard-line-1" style="height: 200px;"></div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <!-- START DASHBOARD CHART -->
+                    <div class="chart-holder" id="dashboard-area-1" style="height: 200px;"></div>
+                    <div class="block-full-width">
+
+                    </div>
+                    <!-- END DASHBOARD CHART -->
+
+                </div>
+                <!-- END PAGE CONTENT WRAPPER -->
+            </div>
+            <!-- END PAGE CONTENT -->
+        </div>
+        <!-- END PAGE CONTAINER -->
+
+        <!-- MESSAGE BOX-->
+        <div class="message-box animated fadeIn" data-sound="alert" id="mb-signout">
+            <div class="mb-container">
+                <div class="mb-middle">
+                    <div class="mb-title"><span class="fa fa-sign-out"></span> Log <strong>Out</strong> ?</div>
+                    <div class="mb-content">
+                        <p>Are you sure you want to log out?</p>
+                        <p>Press No if you want to continue work. Press Yes to logout current user.</p>
+                    </div>
+                    <div class="mb-footer">
+                        <div class="pull-right">
+                            <a href="{% url 'logout' %} " class="btn btn-success btn-lg">Yes</a>
+                            <button class="btn btn-default btn-lg mb-control-close">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END MESSAGE BOX-->
+    </div>
+
+        {% load staticfiles %}
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/jquery/jquery-2.2.3.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/jquery/jquery.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/jquery/jquery-ui.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/base_page.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+       <!-- <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+        -->
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_applyLeave.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/select2.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'sweetalert/sweetalert.min.js' %}"></script>
+
+        <script type="text/javascript">
+
+            $max_val = 15;
+            $("#leave_type").change(function(){
+                var leave_type = $('#leave_type option:selected').val();
+            });
+
+            var jvalidate = $("#id_apply_leave_form").validate({
+
+                ignore: [],
+                rules: {
+
+                    amount: {
+                        required: true,
+                        min: 0
+                    },
+                    end_date: {
+                        greaterThan: "#id_startDate"
+
+                    }
+                    }
+                });
+
+            document.getElementById("Print").onclick = function () {
+                printElement(document.getElementById("printThis"));
+            };
+
+            function printElement(elem) {
+                var domClone = elem.cloneNode(true);
+
+                var $printSection = document.getElementById("printSection");
+
+                if (!$printSection) {
+                    var $printSection = document.createElement("div");
+                    $printSection.id = "printSection";
+                    document.body.appendChild($printSection);
+                }
+
+                $printSection.innerHTML = "";
+                $printSection.appendChild(domClone);
+                window.print();
+            }
+
+        </script>
+
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap.min.js' %}"></script>
+        <!-- END PLUGINS -->
+
+        <!-- START THIS PAGE PLUGINS-->
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/icheck/icheck.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/scrolltotop/scrolltopcontrol.js' %}"></script>
+
+{#        <script type="text/javascript" src="{% static 'new_year_widget/new_year_counter.js' %}"></script>#}
+
+
+       <!-- <script type="text/javascript" src="{% static 'attendance/js/plugins/morris/raphael-min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/morris/morris.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/rickshaw/d3.v3.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/rickshaw/rickshaw.min.js' %}"></script>
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/owl/owl.carousel.min.js' %}"></script>
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/moment.min.js' %}"></script>
+        -->
+
+        <script type="text/javascript" src="/static/attendance/js/plugins/daterangepicker/daterangepicker.js"></script>
+        <!-- END THIS PAGE PLUGINS-->
+
+        <!-- START TEMPLATE -->
+       <!-- <script type="text/javascript" src="{% static 'attendance/js/settings.js' %}"></script>
+        -->
+        <script type="text/javascript" src="{% static 'attendance/js/plugins.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/actions.js' %}"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+              $(".js-example-basic-single").select2();
+
+
+            $('#btn_save').on('click',function(e){
+                e.preventDefault();
+                var form = $(this).parents('form');
+                swal({
+                    title: "Are you sure to Apply?",
+                    text: "Submitting the application will send a leave notification to your supervisor. And you will not be able to edit any further!",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Submit Application!",
+                    closeOnConfirm: false
+                }, function(isConfirm){
+                    if (isConfirm) form.submit();
+                });
+            })
+
+            });
+        </script>
+
+        <!-- END TEMPLATE -->
+    <!-- END SCRIPTS -->
+
+</body>
+</html>

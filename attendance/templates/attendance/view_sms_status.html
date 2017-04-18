@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}user sms list {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h2 id="custom_panel_heading_id">SMS List</h2>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height: 20px;">
+                    {% if error_message %}
+                        <div style="height: 20px; text-align: center">
+                            <h3 style="color: #aa1737" id="">{{ error_message }}</h3>
+                        </div>
+                    {% endif %}
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div class="block">
+                    {% if sms_list %}
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>SMS List</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>SMS Date</th>
+                                                    <th>Supervisor</th>
+                                                    <th>SMS Text</th>
+                                                    <th>Status</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in sms_list %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ list.date}}</td>
+                                                    {% if list.endorsed_by != '' %}
+                                                        <td id="tr_{{ list.id }}_td_2" class="b">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                    {% else %}
+                                                        <td id="tr_{{ list.id }}_td_2" class="b">test</td>
+                                                    {% endif %}
+                                                    <td id="tr_{{ list.id }}_td_3" class="c">{{ list.sms_text }}</td>
+                                                    <td id="tr_{{ list.id }}_td_4" class="d">{{ list.get_isEndorsed_display }}</td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    {% else %}
+                    <div style="height: 20px;">
+                        <h3 style="color: #0077aa; text-align: center" id="custom_message_id">No SMS</h3>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+{% endblock page_js %}

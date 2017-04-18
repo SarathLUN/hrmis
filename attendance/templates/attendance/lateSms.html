@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Late SMS{% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Late SMS list</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                {% if error_message %}
+                    <div style="height: 20px; text-align: center">
+                        <h3 style="color: #aa1737" id="">{{ error_message }}</h3>
+                    </div>
+                {% endif %}
+                <div style="height: 20px; text-align: center">
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div class="block">
+
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% if unread_sms_list %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <a href="{% url 'attendance:generate_sms' %}" class="pull-right">
+                                            <button class="btn btn-info pull-right" id="">
+                                                <span class="glyphicon glyphicon-import"></span>
+                                                Export to late-table
+                                            </button>
+                                        </a>
+
+                                    </div>
+                                    <div class="panel-heading">
+                                        <h3>Pending List</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <form>
+                                        {% csrf_token %}
+                                            <table class="table dataTable table-hover table-bordered" id="result_table" style="table-layout: fixed">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Date</th>
+                                                        <th>Mobile</th>
+                                                        <th>Text</th>
+                                                        <th>Insert Date</th>
+                                                        <td>Action</td>
+
+
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    {% for list in unread_sms_list %}
+                                                    <tr id="tr_{{ list.id }}" class="my_row">
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td id="tr_td_1_{{ list.id }}" class="a">{{ list.date_time }}</td>
+                                                        <td id="tr_td_2_{{ list.id }}" class="b">{{ list.mobile_no }}</td>
+                                                        <td id="tr_td_3_{{ list.id }}" class="c" >{{ list.sms_text }}</td>
+                                                        <td id="tr_td_4_{{ list.id }}" class="d">{{ list.insert_date }}</td>
+                                                        <td id="tr_td_5_{{ list.id }}" class="f">
+                                                            <a href="{% url 'attendance:delete_sms' list.id %}" class="a_value">Delete</a>
+                                                        </td>
+
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+
+                                            </table>
+                                        </form>
+                                    </div>
+
+                                </div>
+                                {% else %}
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa; text-align: center" id="custom_message_id">No SMS text</h3>
+                                </div>
+                                    <br><br>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+
+{% endblock page_js %}

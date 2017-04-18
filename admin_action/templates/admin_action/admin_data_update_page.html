@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Report {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Attendance List</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ obj.employeeName }}</h3>
+                                </div>
+
+                               <form class="form-horizontal" action="{% url 'admin_action:update_data' %}" method="post" id="id_attendance_search_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Select Table</label>
+                                            <div class="col-md-5">
+                                                <select class="form-control " name="table_name" id="id_table_name" required>
+
+                                                    <option value="hr_department">Department</option>
+                                                    <option value="hr_designation">Designation</option>
+                                                    <option value="hr_location">Location</option>
+                                                    <option value="hr_employee">Employee</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+                                </form>
+
+                                {% if table_objects %}
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3 id="custom_panel_heading_id">List</h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+                                            <li style="padding-right: 10px;">
+                                                <input type="text" id="search" class="form-control" placeholder="Type here to search..." />
+                                            </li>
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="printBtn">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="panel-body"  id="dvContents">
+                                        <div class="row">
+
+                                        </div>
+                                        <br><br>
+                                        <table class="table table-responsive table-st dataTable table-hover table-striped" style="font-size: 12px; " id="des_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Column 1</th>
+                                                    <th>Column 2</th>
+                                                    <th>Column 3</th>
+                                                    <th>Action</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in table_objects %}
+                                                <tr id="tr_{{ list.0}}" class="my_row">
+                                                    <td id="tr_{{ list.0 }}_td_4" class="d">{{ forloop.counter }}</td>
+                                                    <td id="tr_{{ list.0 }}_td_5" class="e">{{ list.0 }}</td>
+                                                    <td id="tr_{{ list.0 }}_td_6" class="f">{{ list.1 }}</td>
+                                                    <td id="tr_{{ list.0 }}_td_8" class="g">{{ list.2 }}</td>
+                                                    <td><a href="{% url "admin_action:delete_data" list.0 table_name %}">Delete</a></td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                {% elif dept_attendance_list %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3 id="custom_panel_heading_id2">List</h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+                                            <li style="padding-right: 10px;">
+                                                <input type="text" id="search" class="form-control" placeholder="Type here to search..." />
+                                            </li>
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="printBtn2">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="panel-body"  id="dvContents2">
+                                        <div class="panel panel-default" style="">
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">Department:</label>
+                                                <label class="col-md-10 control-label">{{ employee_dept }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">From</label>
+                                                <label class="col-md-3 control-label">{{ start_date|date }}</label>
+                                                <label class="col-md-1 control-label">to</label>
+                                                <label class="col-md-3 control-label">{{ end_date|date }}</label>
+                                            </div>
+
+                                        </div>
+                                        <table class="search-table table table-responsive table-st dataTable table-hover table-striped" style="font-size: 12px; " id=""des_table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Designation</th>
+                                                    <th>Date</th>
+                                                    <th>In Time</th>
+                                                    <th>Out Time</th>
+                                                    <th>Status</th>
+                                                    <th>Endorsement</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in dept_attendance_list %}
+                                                <tr id="" class="my_row">
+                                                    <td class="b">{{ list.name }}</td>
+                                                    <td class="c">{{ list.designation }}</td>
+                                                    <td class="d">{{ list.date }}</td>
+                                                    <td class="e">{{ list.in_time }}</td>
+                                                    <td class="f">{{ list.out_time }}</td>
+                                                    <td class="g">{{ list.status }}</td>
+                                                    <td class="h">{{ list.endorsement }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            {% endif %}
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="modal_basic" tabindex="-1" role="dialog" aria-labelledby="defModalHead" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="form-horizontal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="defModalHead">Late Notification</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Department</label>
+                            <div class="col-md-5">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Employee</label>
+                            <div class="col-md-5">
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Date Range</label>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate" data-date-format="" value="">
+                            </div>
+
+                        </div>
+
+                        <div class="panel-footer">
+                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_getAttendanceHistory.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+
+    <script type="text/javascript" src="{%  static 'attendance/js/additonal_js/html-table-search.js' %}"></script>
+    <script type="text/javascript">
+        $("#search").keyup(function(){
+                _this = this;
+                // Show only matching TR, hide rest of them
+                $.each($("#des_table tbody tr"), function() {
+                    if($(this).text().toLowerCase().indexOf($(_this).val().toLowerCase()) === -1)
+                       $(this).hide();
+                    else
+                       $(this).show();
+                });
+            });
+    </script>
+    <script type="text/javascript">
+
+        jQuery.validator.addMethod("greaterThan",
+            function(value, element, params) {
+
+                if (!/Invalid|NaN/.test(new Date(value))) {
+                    return new Date(value) >= new Date($(params).val());
+                }
+
+                return isNaN(value) && isNaN($(params).val())
+                    || (Number(value) > Number($(params).val()));
+            },'Must be greater or equal.');
+
+
+            var jvalidate = $("#id_attendance_search_form").validate({
+                ignore: [],
+                rules: {
+
+                    table_name: {
+                        required: true
+
+                    }
+                    }
+                });
+
+        </script>
+
+
+
+{% endblock page_js %}

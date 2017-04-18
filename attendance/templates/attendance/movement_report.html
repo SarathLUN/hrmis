@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee Movement Report {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Movement Report</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div style="height: 20px;">
+                                    <h3 style="color: #0077aa" id="custom_message_id">{{ obj.employeeName }}</h3>
+                                </div>
+
+                               <form class="form-horizontal" action="{% url 'attendance:movement_report' %}" method="post" id="id_attendance_search_form">
+                                    {% csrf_token %}
+                                    <div class="panel panel-default">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Department</label>
+                                            <div class="col-md-5">
+                                                <select class="form-control js-example-basic-single" name="department" id="id_department">
+                                                    <option value="">Select</option>
+                                                    {% for dept in department_list %}
+                                                        <option value="{{ dept.department_id }}" >{{ dept.departmentName }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Employee</label>
+                                            <div class="col-md-5">
+                                                <select class="form-control js-example-basic-single" name="employee" id="id_employee" required>
+                                                    <option value="">Select</option>
+                                                    {% for emp in employee_list %}
+                                                        <option value="{{ emp.employee_id }}" >{{ emp.employeeName }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                           <!-- <div class="col-md-4">
+                                                <label class="check"><input type="checkbox" name="all_employee" id="id_all_employee" value="all" class="icheckbox_minimal-grey"/> All Employee</label>
+                                            </div>
+
+                                            -->
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Date Range</label>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" class="form-control datepicker" placeholder="End Date" name="endDate" id="id_endDate">
+                                            </div>
+                                        </div>
+
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+                                </form>
+
+                                {% if movement_list %}
+
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div class="panel-title-box">
+                                            <h3 id="custom_panel_heading_id">Movement Report</h3>
+                                        </div>
+                                        <ul class="panel-controls panel-controls-title">
+                                            <li>
+                                                <button class="btn btn-info pull-right" id="printBtn">Print<span class="fa fa-print fa-right"></span></button>
+                                            </li>
+                                            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="panel-body"  id="dvContents">
+                                        <div class="row">
+                                            <!--
+                                            <div class="col-md-12">
+                                                <table>
+                                                    <tr>
+                                                        <td style="width: 80%;"></td>
+                                                        <td style="width: 20%;">
+
+                                                            <img src="/static/attendance/img/LamSys-logo-final-inverse_trans.png"  style="height: 40px; width: 140px; text-align: right;">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                            -->
+                                            <div class="col-xs-6" style="">
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Name</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.employee_id.employeeName }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Department</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.department_id.departmentName }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Designation</label>
+                                                <label class="col-xs-8 control-label">: {{ employee_obj.des_id.designation }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label">Duration</label>
+                                                <label class="col-xs-8 control-label">: {{ start_date|date:"M d, Y" }} -- {{ end_date|date:"M d, Y" }}</label>
+
+                                            </div>
+
+                                        </div>
+                                       <!--
+                                        <div class=" col-xs-4" style="">
+
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Total</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Total }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Present</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Present }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Absent</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Absent }}</label>
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Leave</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Leave }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">Late</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.Late }}</label>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-xs-4 control-label"></label>
+                                                <label class="col-xs-4 control-label">I/R</label>
+                                                <label class="col-xs-4 control-label">: {{ count_list.I_R }}</label>
+
+                                            </div>
+                                            <hr>
+                                        </div>
+                                        -->
+
+                                        </div>
+                                        <br><br>
+                                        <table class="table table-responsive table-st dataTable table-hover table-striped" style="font-size: 11px; text-align: center;">
+                                            <caption style="text-align: center;"><h3>Movement Report</h3></caption>
+                                            <thead >
+                                                <tr>
+                                                    <th><p style="text-align: center;">Date</p></th>
+                                                    <th><p style="text-align: center;">In Time</p></th>
+                                                    <th><p style="text-align: center;">Out Time</p></th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in movement_list %}
+                                                <tr id="tr_{{ list.id}}" class="my_row">
+                                                    <td id="" class="d">{% autoescape off %} {{ list.date }} {% endautoescape %}</td>
+                                                    <td id="" class="e">{{ list.in_time }}</td>
+                                                    <td id="" class="f">{{ list.out_time }}</td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                            {% endif %}
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="modal_basic" tabindex="-1" role="dialog" aria-labelledby="defModalHead" aria-hidden="true">
+        <div class="modal-dialog">
+            <form class="form-horizontal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="defModalHead">Late Notification</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Department</label>
+                            <div class="col-md-5">
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Employee</label>
+                            <div class="col-md-5">
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Date Range</label>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control datepicker" placeholder="Start Date" name="startDate" id="id_startDate" data-date-format="" value="">
+                            </div>
+
+                        </div>
+
+                        <div class="panel-footer">
+                            <button class="btn btn-primary pull-right" id="btn_save">Generate <span class="fa fa-list fa-right"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-datepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-timepicker.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-colorpicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-file-input.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/tagsinput/jquery.tagsinput.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/app_attendance/page_movemnet_report.js' %}"></script>
+
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+    <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+
+
+    <script type="text/javascript">
+
+        jQuery.validator.addMethod("greaterThan",
+            function(value, element, params) {
+
+                if (!/Invalid|NaN/.test(new Date(value))) {
+                    return new Date(value) >= new Date($(params).val());
+                }
+
+                return isNaN(value) && isNaN($(params).val())
+                    || (Number(value) > Number($(params).val()));
+            },'Must be greater or equal.');
+
+
+            var jvalidate = $("#id_attendance_search_form").validate({
+                ignore: [],
+                rules: {
+
+                    department: {
+                        required: true
+
+                    },
+                    employee: {
+                        required: true
+
+                    },
+                    startDate: {
+                        required: true
+                    },
+                    endDate: {
+                        required: true,
+                        greaterThan: "#id_startDate"
+
+                    }
+                    }
+                });
+
+        </script>
+
+
+{% endblock page_js %}
