@@ -5,4 +5,4 @@ attendance/templates/* linguist-vendored
 holiday/templates/* linguist-vendored
 hr/templates/* linguist-vendored
 leave/templates/* linguist-vendored
-templates/*
+templates/* linguist-vendored
