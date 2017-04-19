@@ -1,1 +1,8 @@
-h
+static/* linguist-vendored
+account/templates/* linguist-vendored
+admin_action/templates/* linguist-vendored
+attendance/templates/* linguist-vendored
+holiday/templates/* linguist-vendored
+hr/templates/* linguist-vendored
+leave/templates/* linguist-vendored
+templates/*
