@@ -1,5 +1,6 @@
 from django.db import models
 from hr.models import Employee, EmployeeDesignation
+from datetime import date
 
 # Create your models here.
 
@@ -40,6 +41,18 @@ class LeaveCategory(models.Model):
     forward_validity = models.IntegerField(default=0)
     pre_condition = models.IntegerField(default=0)
 
+class EmployeeLeaveSetting(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    leave_category = models.ForeignKey(LeaveCategory, on_delete=models.CASCADE)
+    frequency = models.IntegerField()
+    year = models.IntegerField(default=date.today().year)
+    isActive = models.NullBooleanField()
+    isDelete = models.NullBooleanField()
+    insertUser = models.CharField(max_length=50)
+    insertDate = models.DateField(blank=True, null=True)
+    updateUser = models.CharField(max_length=50)
+    updateDate = models.DateField(blank=True, null=True)
+    project = models.CharField(max_length=100)
 
 
 class LeaveHistory(models.Model):
@@ -82,6 +95,7 @@ class LeaveAllotment(models.Model):
     updateDate = models.DateField(blank=True, null=True)
     project = models.CharField(max_length=100)
     insertType = models.CharField(max_length=30, default='0')
+    frequency_count = models.IntegerField(null=True, blank=True, default=0)
 
 
 class LeaveDetail(models.Model):

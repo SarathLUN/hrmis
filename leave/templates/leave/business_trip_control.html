@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave Frequency {% endblock %}
+
+{% block content-heading %}
+    <div class="panel-heading">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Leave Frequency Control</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if messages %}
+        <div style="height: 20px; text-align: center;" class="messages">
+        {% for message in messages %}
+            <h3 style="color: #aa171e" id="custom_message_id" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h3>
+        {% endfor %}
+        </div>
+    {% endif %}
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div style="height: 20px;">
+                    <h3 style="color: #0077aa" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+
+                            <div class="col-md-12" id="">
+
+                                <form class="form-horizontal" action="{% url 'leave:business_trip_control' %}" method="post" id="id_dept_form">
+                                    {% csrf_token %}
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3>Add Leave Frequency</h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Leave Category</label>
+                                                <div class="col-md-7">
+                                                    <select class="js-example-basic-single form-control" name="category">
+                                                        {% for list in leave_category_list %}
+                                                        <option value="{{ list.id }}">{{ list.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Employee List</label>
+                                                <div class="col-md-7">
+                                                    <select multiple class="form-control select" data-live-search="true" name="emp_list">
+                                                        {% for list in employee_list %}
+                                                            <option value="{{ list.employee_id }}">{{ list.employeeName }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Frequency</label>
+                                                <div class="col-md-7">
+                                                    <input class="form-control" name="frequency" type="number" value="1"/>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right"  id="btn_save">
+                                                Save
+                                                <span class="fa fa-floppy-o fa-right"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Leave category List</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <table class="table dataTable table-hover table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Days</th>
+                                                    <th>Frequency</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for list in active_setting_list %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ list.employee.employeeName }}</td>
+                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.leave_category.name }}</td>
+                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.frequency }}</td>
+                                                    <td><a href="">Edit</a></td>
+
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block page_js %}
+    {% load staticfiles %}
+     <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_leaveCategoryAdd.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/icheck/icheck.min.js' %}"></script>
+    <script>
+
+        $('input[name=entitled_radio]').click(function () {
+            if (this.id == "job_life") {
+                $("#show_entitled").show('fadeIn');
+            } else {
+                $("#show_entitled").hide('fadeOut');
+            }
+        });
+
+        $('input[name=validity_radio]').click(function () {
+            if (this.id == "for_month") {
+                $("#show_validity").show('fadeIn');
+            } else {
+                $("#show_validity").hide('fadeOut');
+            }
+        });
+
+        $('input[name=is_forward]').change(function () {
+            if ($(this).is(':checked')){
+                $("#is_forward_div").show('fadeIn');
+            } else {
+                $("#is_forward_div").hide('fadeOut');
+            }
+        });
+
+
+    </script>
+{% endblock page_js %}

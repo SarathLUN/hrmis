@@ -15,6 +15,9 @@ from HRM.myScript import convert_to_date
 from leave.models import LeaveHistory
 from django.core.paginator import Paginator,EmptyPage, PageNotAnInteger
 from django.core import serializers
+from itertools import chain
+
+from itertools import *
 # Create your views here.
 
 @login_required
@@ -35,22 +38,28 @@ def showAttendanceList(request):
 
     context = {}
     attendance_list = []
-    start_date = datetime.strptime(request.POST['startDate'], "%Y/%m/%d")
-    end_date = datetime.strptime(request.POST['endDate'], "%Y/%m/%d")
+    start_date = convert_to_date(request.POST['startDate'])
+    end_date = convert_to_date(request.POST['endDate'])
     dayCount = abs(end_date-start_date).days + 1
     employee_list = EmployeeDesignation.objects.filter(department_id_id = request.POST['department'], isActive=True).order_by('employee_id__employeeName')
 
 
-    for employee_obj in employee_list.iterator():
+    for employee_obj in employee_list:
 
         date_value = start_date
 
         for count in range(0,dayCount):
 
-            if date_value.date() <= date.today():
-                working_day, status, day_status, in_time, out_time, login_limit, late_message, endorsement, late_status, attendance_in_holiday = get_attendance_information_extended(date_value,employee_obj)
 
-                attendance_list.append({'id' : employee_obj.employee_id.employee_id, 'designation' : employee_obj.des_id.designation ,'name' : employee_obj.employee_id.employeeName, 'card_id' : employee_obj.employee_id.cardId, 'date' : date_value.date(), 'in_time' : in_time, 'out_time' : out_time, 'login_limit' : login_limit, 'status' : status, 'late_message' : late_message, 'endorsement' : endorsement, 'attendance_in_holiday' : attendance_in_holiday})
+            if date_value.date() <= date.today():
+
+                if employee_obj.employee_id.joiningDate > date_value.date():
+                    attendance_list.append({'id' : employee_obj.employee_id.employee_id, 'designation' : employee_obj.des_id.designation ,'name' : employee_obj.employee_id.employeeName, 'card_id' : employee_obj.employee_id.cardId, 'date' : date_value.date(), 'in_time' : '', 'out_time' : '', 'login_limit' : '', 'status' : 'Has not Joined', 'late_message' : 'Has not Joined', 'endorsement' : 'Has not Joined', 'attendance_in_holiday' : 'Has not Joined'})
+
+                else:
+                    working_day, status, day_status, in_time, out_time, login_limit, late_message, endorsement, late_status, attendance_in_holiday = get_attendance_information_extended(date_value,employee_obj)
+
+                    attendance_list.append({'id' : employee_obj.employee_id.employee_id, 'designation' : employee_obj.des_id.designation ,'name' : employee_obj.employee_id.employeeName, 'card_id' : employee_obj.employee_id.cardId, 'date' : date_value.date(), 'in_time' : in_time, 'out_time' : out_time, 'login_limit' : login_limit, 'status' : status, 'late_message' : late_message, 'endorsement' : endorsement, 'attendance_in_holiday' : attendance_in_holiday})
 
             '''
             if working_day:
@@ -304,6 +313,11 @@ def getEmployeeAttendaceHistory(request):
 
 
 @login_required
+def dailyAttendaceReport(request):
+
+    return render(request, 'attendance/daily_attendance_report.html')
+
+@login_required
 def addRegularOfficeTime(request, message_id):
 
     context = {}
@@ -494,6 +508,9 @@ def lateAttendance(request):
     try:
         employee_list = EmployeeDesignation.objects.filter(supervisor_id=request.user.employeeuser.employee.employee_id, isActive=True).order_by('employee_id__employeeName').values('employee_id_id')
         late_history = Late.objects.filter(emp_id_id__in=employee_list, isActive=True, isEndorsed='0').order_by('-date')
+        previous_history = Late.objects.filter(emp_id_id__in=employee_list, isActive=True, isEndorsed__in=['1','2','3','4'], date__year='2016').order_by('emp_id__employeeName','-date')
+        context['previous_history'] = previous_history
+        print(previous_history)
         paginator = Paginator(late_history, 100)
         page = request.GET.get('page')
 
@@ -506,6 +523,8 @@ def lateAttendance(request):
 
         context['contacts'] = contacts
         context['late_history'] = late_history
+
+
     except:
         context['error_message'] = '!!! This page is for User type Employee !!!'
 
@@ -681,8 +700,16 @@ def get_own_attendance(request):
     employee_user = EmployeeUser.objects.get(user_id=request.user.id)
     employee_obj = get_object_or_404(Employee,pk=employee_user.employee.employee_id)
 
-    child_list = AttendanceReportSetting.objects.filter(parent_employee=employee_obj, isActive=True)
+    subordinate_list = EmployeeDesignation.objects.filter(isActive=True, supervisor=employee_obj).values_list('employee_id__employee_id', 'employee_id__employeeName')
+    context['subordinate_list'] = subordinate_list
+
+    child_list = AttendanceReportSetting.objects.filter(parent_employee=employee_obj, isActive=True).values_list('child_employee__employee_id', 'child_employee__employeeName')
     context['child_list'] = child_list
+
+    # result_list = list(chain(subordinate_list, child_list))
+    result_list = list(set(subordinate_list)|set(child_list))
+    context['result_list'] = result_list
+    #print(result_list)
 
     if request.method == "POST":
 
@@ -1109,7 +1136,7 @@ def view_user_sms(request):
         employee_obj = get_object_or_404(Employee,pk=employee_user.employee.employee_id)
 
 
-        sms_list = Late.objects.filter(isActive=True, emp_id=employee_obj).order_by('date')
+        sms_list = Late.objects.filter(isActive=True, emp_id=employee_obj, date__year=date.today().year).order_by('-date')
 
         for list in sms_list:
             check_sms = list.sms_text.find(" ",1,20)
@@ -1145,8 +1172,9 @@ def attedance_report_setting(request):
 
     context = {}
 
-    active_employee_list = EmployeeDesignation.objects.filter(isActive=True)
 
+    active_employee_list = EmployeeDesignation.objects.values('employee_id__employee_id', 'employee_id__employeeName', 'department_id__departmentName', 'des_id__designation').distinct()
+    print(active_employee_list)
     if request.method == "POST":
         parent_id = request.POST['parent']
         old_list = []

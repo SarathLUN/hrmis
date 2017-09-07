@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^setParentChild/$', views.attedance_report_setting, name="set_parent_child"),
     url(r'(?P<parent_id>[0-9]+)/create_relation/$', views.parent_child_relation, name="create_relation"),
     url(r'endorsementReport/$', views.endorsement_report, name="endorsement_report"),
+    url(r'dailyAttendance/$', views.dailyAttendaceReport, name="daily_attendance"),
 ]

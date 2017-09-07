@@ -1,0 +1,58 @@
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>Leave Details</h3>
+        </div>
+        {% if joining_date_null_error %}
+            <div class="panel-body">
+                <h3 style="color: #0077aa; text-align: center" id="custom_message_id">{{ joining_date_null_error }}</h3>
+            </div>
+        {% else %}
+        <div class="panel-body">
+            <table class="table dataTable table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Feature</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr id="tr_{{ list.id }}" class="my_row">
+                        <td>Name</td>
+                        <td id="tr_{{ list.id }}_td_1" class="a">{{ leave_obj.name }}</td>
+                    </tr>
+{#                    <tr>#}
+{#                        <td>Holiday skip</td>#}
+{#                        <td>{{ leave_obj.holiday_skip }}</td>#}
+{#                    </tr>#}
+{#                    <tr>#}
+{#                        <td>IsForward</td>#}
+{#                        <td>{{ leave_obj.is_forward }}</td>#}
+{#                    </tr>#}
+                    {% if current_leave_balance %}
+                    <tr>
+                        <td>Current L. Balance</td>
+                        <td>{{ current_leave_balance }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td>New L. Balance</td>
+                        <td>{{ leave_obj.amount }}</td>
+                    </tr>
+                    {% if frequency %}
+                    <tr>
+                        <td>Available Frequency</td>
+                        <td>{{ frequency }}</td>
+                    </tr>
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+        </div>
+    {% endif %}
+
+    </div>
+</div>

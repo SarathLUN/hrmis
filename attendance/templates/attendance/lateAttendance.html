@@ -24,6 +24,7 @@
 {% endblock %}
 
 {% block content %}
+
     <div class="panel-body">
         <div class="row">
             <div class="col-md-12">
@@ -231,22 +232,78 @@
             </div>
 
         </div>
-    </div>
+        <div class="row">
+            <div class="col-md-12">
 
-    <div class="modal" id="modal_large" tabindex="-1" role="dialog" aria-labelledby="largeModalHead" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="largeModalHead">Large Modal</h4>
+                <div class="block">
+                    {% if previous_history %}
+                    <div class="page-content-wrap">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Previous Applications</h3>
+                                    </div>
+
+                                    <div class="panel-body faq">
+                                        {% for list in previous_history %}
+                                            {% ifchanged list.emp_id.employeeName %}
+                                                {% if forloop.counter > 1 %}
+                                                    </tbody>
+                                                    </table>
+                                                    </div>
+                                                    </div>
+
+
+                                                {% endif %}
+                                                <div class="faq-item">
+                                                    <div class="faq-title"><span class="fa fa-angle-down"></span>{{ list.emp_id.employeeName }}</div>
+                                                    <div class="faq-text">
+                                                        <table class="table dataTable table-hover table-bordered" style="font-size: smaller;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Date</th>
+                                                                    <th>Reason</th>
+                                                                    <th>Action</th>
+
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                            {% endifchanged %}
+                                                <tr id="tr_{{ list.id }}" class="my_row">
+
+                                                        <td id="tr_{{ list.id }}_td_4" class="d">{{ list.date }}</td>
+                                                        {% if list.sms_text|length <= 159 and ' ' in list.sms_text|slice:"2:" %}
+                                                        <td id="tr_{{ list.id }}_td_3" class="c">{{ list.sms_text }}</td>
+                                                        {% else %}
+                                                        <td id="tr_{{ list.id }}_td_3" class="c">UNREADABLE MESSAGE!!</td>
+                                                        {% endif %}
+                                                        <td id="tr_{{ list.id }}_td_7" class="g">{{ list.get_isEndorsed_display }}</td>
+
+                                                    </tr>
+
+                                        {% endfor %}
+                                        </tbody>
+                                        </table>
+                                        </div>
+                                        </div>
+
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {% endif %}
                 </div>
-                <div class="modal-body">
-                    Some content in modal example
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+
             </div>
+
         </div>
     </div>
 
@@ -267,7 +324,7 @@
         <script type="text/javascript" src="{% static 'attendance/js/plugins/laddda/ladda.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'attendance/js/plugins/laddda/spin.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'sweetalert/sweetalert.min.js' %}"></script>
-
+        <script type="text/javascript" src={% static "attendance/js/faq.js" %}></script>
         <script type="text/javascript" src="{%  static 'attendance/js/page_customJS/page_lateAttendance.js' %}"></script>
         <script>
 

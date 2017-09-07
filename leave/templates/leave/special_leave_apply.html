@@ -1,0 +1,431 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply Leave {% endblock %}
+
+{% block page_css %}
+    <style type="text/css">
+
+        @media screen {
+            #printSection {
+                display: none;
+            }
+        }
+        @media print {
+            body * {
+                visibility:hidden;
+            }
+            #printSection, #printSection * {
+                visibility:visible;
+            }
+            #printSection {
+                position:absolute;
+                left:0;
+                top:0;
+            }
+        }
+
+    </style>
+
+
+{% endblock %}
+
+{% block content-heading %}
+
+
+
+    <div class="panel-heading ">
+        <div class="panel-title-box">
+            <h3 id="custom_panel_heading_id">Leave Status</h3>
+        </div>
+        <ul class="panel-controls panel-controls-title">
+            <li>
+
+            </li>
+            <li><a href="#" class="panel-fullscreen rounded"><span class="fa fa-expand"></span></a></li>
+        </ul>
+
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    <div class="panel-body ">
+        <div class="row">
+            <div class="col-md-12">
+                {% if error_message %}
+                    <div style="height: 20px; text-align: center">
+                        <h3 style="color: #627baa; text-align: center;" id="">{{ error_message }}</h3>
+                    </div>
+                {% endif %}
+                <div style="height: 20px;">
+                    <h3 style="color: #aa1737; text-align: center;" id="custom_message_id">{{ form_message }}</h3>
+                </div>
+                <div style="height: 20px; display: none;" id="eligibility_message_div">
+                    <h3 style="color: #aa1737; text-align: center;">You are not Eligible to Apply for this Leave</h3>
+                </div>
+                <div class="block">
+                    <div class="page-content-wrap">
+                        <div class="row">
+
+                            <div class="col-md-7" id="">
+
+                                <form class="form-horizontal" action="{% url 'leave:special_leave_apply' 'added' %}" method="post" id="id_apply_leave_form">
+                                    {% csrf_token %}
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3>Apply for Leave</h3>
+                                        </div>
+                                        <div class="panel-body">
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Leave Type</label>
+                                                <div class="col-md-7">
+                                                    <select class="form-control js-example-basic-single" name="type" id="leave_type" required>
+                                                        <option value="">Select</option>
+
+                                                        {% for list in balance_list %}
+                                                            <option value="{{ list.id }}">{{ list.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" id="div_validity" style="display: none;">
+                                                <label class="col-md-3 control-label">Option</label>
+
+                                                <div class="col-md-4">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" value="1"/> Concurrent</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" value="2" checked="checked" /> New</label>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">From Date</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control datepicker" placeholder="Start Date" name="start_date" id="id_startDate">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Total</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control" value="" id="id_amount" name="amount" placeholder="Number of Days"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">To Date</label>
+                                                <div class="col-md-7">
+                                                    <input required type="text" class="form-control datepicker" style="color:black;" placeholder="End Date" name="end_date" id="id_endDate" disabled>
+                                                    <input type="hidden" id="id_hidden_to_date" name="hidden_to_date" value="3"/>
+                                                </div>
+                                            </div>
+
+                                            {% if permission %}
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Applied to</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" style="color: #000000" value="{{ employee_info.supervisor.employeeName }}" id="id_supervisor" name="supervisor" disabled/>
+                                                    <input type="hidden" value="0" id="ajax_message" name="hiddhen_confirmed_by"/>
+                                                    <span id="span_confirmed_by" style="color: #9b0000;"></span>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 col-xs-12 control-label">Reason</label>
+                                                <div class="col-md-7 col-xs-12">
+                                                    <textarea class="form-control" rows="3" name="reason" required></textarea>
+                                                    <span id="span_description" style="color: #9B0000;"></span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        {% if permission %}
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right"  id="btn_save">Apply</button>
+                                        </div>
+                                        {% else %}
+                                        <div class="panel-footer">
+                                            <button class="btn btn-primary pull-right"  id="btn_save" disabled>Apply</button>
+                                            <br>
+                                            <span style="color: #9b0000;">You cannot apply!! No supervisor is Assigned. Contact to <strong> HR department</strong></span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                </form>
+                            </div>
+
+                            <div class="col-md-5" id="leave_details_id">
+                            </div>
+{#                            <div class="col-md-5" id="leave_details_id">#}
+{#                                <div class="panel panel-default">#}
+{#                                    <div class="panel-heading">#}
+{#                                        <h3>Remaining Leave</h3>#}
+{#                                    </div>#}
+{#                                    {% if joining_date_null_error %}#}
+{#                                        <div class="panel-body">#}
+{#                                            <h3 style="color: #0077aa; text-align: center" id="custom_message_id">{{ joining_date_null_error }}</h3>#}
+{#                                        </div>#}
+{#                                    {% else %}#}
+{#                                    <div class="panel-body">#}
+{#                                        <table class="table dataTable table-hover table-bordered">#}
+{#                                            <thead>#}
+{#                                                <tr>#}
+{#                                                    <th>Leave Category</th>#}
+{#                                                    <th>Days</th>#}
+{##}
+{#                                                </tr>#}
+{#                                            </thead>#}
+{##}
+{#                                            <tbody>#}
+{#                                                {% for list in balance_list %}#}
+{#                                                <tr id="tr_{{ list.id }}" class="my_row">#}
+{#                                                    <td id="tr_{{ list.id }}_td_1" class="a">{{ list.name }}</td>#}
+{#                                                    <td id="tr_{{ list.id }}_td_2" class="b">{{ list.balance }}</td>#}
+{##}
+{#                                                </tr>#}
+{#                                            {% endfor %}#}
+{#                                            </tbody>#}
+{##}
+{#                                        </table>#}
+{#                                    </div>#}
+{#                                {% endif %}#}
+{##}
+{#                                </div>#}
+{#                            </div>#}
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3>Current Year Leave Application History</h3>
+                                    </div>
+                                    {% if leave_application_history %}
+                                        <div class="panel-body">
+                                            <table class="table dataTable table-hover table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date Range</th>
+                                                        <th>Total</th>
+                                                        <th>Category</th>
+                                                        <th>Applied To</th>
+                                                        <th>Status</th>
+                                                        <th>Reason</th>
+                                                        <th>Action</th>
+
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    {% for list in leave_application_history %}
+                                                        {% if  list.isActive == 1 %}
+                                                            {% if list.endorsement == '0' %}
+                                                                <tr id="tr_{{ list.id }}" class="my_row active">
+                                                                    <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                    <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                    <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                    <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                    <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                    <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                    <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                    <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                </tr>
+                                                            {% elif list.endorsement == '1' %}
+                                                                <tr id="tr_{{ list.id }}" class="my_row success">
+                                                                    <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                    <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                    <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                    <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                    <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                    <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                    <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                    <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                </tr>
+
+                                                            {% elif list.endorsement == '3' %}
+                                                                <tr id="tr_{{ list.id }}" class="my_row info">
+                                                                    <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                    <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                    <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                    <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                    <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                    <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                    <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                    <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                </tr>
+                                                            {% else %}
+                                                                <tr id="tr_{{ list.id }}" class="my_row danger">
+                                                                    <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                    <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                    <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                    <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                    <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                    <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                    <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td>
+                                                                    <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td> -->
+                                                                    <td></td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                        {% else %}
+                                                            {% if list.endorsement == '1' %}
+                                                                <tr id="tr_{{ list.id }}" class="my_row success">
+                                                                    <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                    <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                    <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                    <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                    <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                    <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                    <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                    <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                </tr>
+                                                            {% elif list.endorsement == '2' %}
+                                                                <tr id="tr_{{ list.id }}" class="my_row danger">
+                                                                    <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                    <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                    <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                    <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                    <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                    <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                    <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td>
+                                                                    <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td> -->
+                                                                    <td></td>
+                                                                </tr>
+
+                                                            {% elif list.endorsement == '3' %}
+                                                                <tr id="tr_{{ list.id }}" class="my_row info">
+                                                                    <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                    <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                    <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                    <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                    <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                    <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                    <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                    <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                </tr>
+                                                            {% else %}
+                                                                <tr id="tr_{{ list.id }}" class="my_row active">
+                                                                    <td id="td_1_tr_{{ list.id }}" class="a">{{ list.date_from|date:"M d, Y"}} - {{ list.date_to|date:"M d, Y" }}</td>
+                                                                    <td id="td_2_tr_{{ list.id }}" class="b">{{ list.count }}</td>
+                                                                    <td id="td_6_tr_{{ list.id }}" class="f">{{ list.type.name }}</td>
+                                                                    <td id="td_7_tr_{{ list.id }}" class="f">{{ list.endorsed_by.get_gender_display }} {{ list.endorsed_by.employeeName }}</td>
+                                                                    <td id="td_3_tr_{{ list.id }}" class="c">{{ list.get_endorsement_display }}</td>
+                                                                    <td id="td_4_tr_{{ list.id }}" class="d">{{ list.description }}</td>
+                                                                    <!-- <td id="td_5_tr_{{ list.id }}" class="e"><a href="#" data-toggle="modal" data-target="#modal_large">print</a></td> -->
+                                                                    <td id="td_5_tr_{{ list.id }}" class="e"><a href="{% url 'leave:print_leave' list.id %}" target="_blank">print</a></td>
+                                                                </tr>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                {% endfor %}
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <div style="height: 20px;">
+                                            <h3 style="color: #0077aa; text-align: center" id="custom_message_id">No leave History</h3>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+
+
+{% block page_js %}
+    {% load staticfiles %}
+
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/languages/jquery.validationEngine-en.js' %}"></script>
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/validationengine/jquery.validationEngine.js' %}"></script>
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/jquery-validation/jquery.validate.js' %}"></script>
+
+        <script type='text/javascript' src="{% static 'attendance/js/plugins/maskedinput/jquery.maskedinput.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/app_leave/page_special_apply_leave.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/select2.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'sweetalert/sweetalert.min.js' %}"></script>
+
+        <script type="text/javascript">
+
+            $max_val = 15;
+            $("#leave_type").change(function(){
+                var leave_type = $('#leave_type option:selected').val();
+            });
+
+            var jvalidate = $("#id_apply_leave_form").validate({
+
+                ignore: [],
+                rules: {
+
+                    amount: {
+                        required: true,
+                        min: 0
+                    },
+                    end_date: {
+                        greaterThan: "#id_startDate"
+
+                    }
+                    }
+                });
+
+            document.getElementById("Print").onclick = function () {
+                printElement(document.getElementById("printThis"));
+            };
+
+            function printElement(elem) {
+                var domClone = elem.cloneNode(true);
+
+                var $printSection = document.getElementById("printSection");
+
+                if (!$printSection) {
+                    var $printSection = document.createElement("div");
+                    $printSection.id = "printSection";
+                    document.body.appendChild($printSection);
+                }
+
+                $printSection.innerHTML = "";
+                $printSection.appendChild(domClone);
+                window.print();
+            }
+
+        </script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+              $(".js-example-basic-single").select2();
+
+
+            $('#btn_save').on('click',function(e){
+                e.preventDefault();
+                var form = $(this).parents('form');
+                swal({
+                    title: "Are you sure to Apply?",
+                    text: "Submitting the application will send a leave notification to your supervisor. And you will not be able to edit any further!",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Submit Application!",
+                    closeOnConfirm: false
+                }, function(isConfirm){
+                    if (isConfirm) form.submit();
+                });
+            })
+
+            });
+        </script>
+
+{% endblock page_js %}

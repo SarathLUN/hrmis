@@ -55,80 +55,81 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <label class="col-md-3 control-label">Leave Type</label>
-                                                <div class="col-md-4">
-                                                    <select class="form-control select" name="leave_type_select">
-                                                        <option selected="selected" value="0">Yearly</option>
-                                                        <option value="1">Special</option>
-
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <input type="text" class="form-control" value="0" name="leave_type_text" id="" placeholder="Number"/>
-                                                </div>
-                                            </div>
+{#                                            <div class="form-group">#}
+{#                                                <label class="col-md-3 control-label">Leave Type</label>#}
+{#                                                <div class="col-md-4">#}
+{#                                                    <select class="form-control select" name="leave_type_select">#}
+{#                                                        <option selected="selected" value="0">Yearly</option>#}
+{#                                                        <option value="1">Special</option>#}
+{##}
+{#                                                    </select>#}
+{#                                                </div>#}
+{#                                                <div class="col-md-3">#}
+{#                                                    <input type="text" class="form-control" value="0" name="leave_type_text" id="" placeholder="Number"/>#}
+{#                                                </div>#}
+{#                                            </div>#}
 
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Entitled</label>
                                                 <div class="col-md-2">
-                                                    <label class="check"><input type="radio" class="iradio" name="entitled_radio" value="-1"/> N/A</label>
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="entitled_radio" value="-1"/> N/A</label>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="check"><input type="radio" class="iradio" name="entitled_radio" checked="checked" value="0"/> Yearly</label>
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="entitled_radio" checked="checked" value="0"/> Yearly</label>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="check"><input type="radio" class="iradio" name="entitled_radio"  value="1"/> Job Life</label>
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="entitled_radio"  value="1" id="job_life"/> Job Life</label>
                                                 </div>
-                                                <div class="col-md-1">
-                                                    <input required type="text" class="form-control" value="" name="job_life_entitled" id="" placeholder=""/>
+                                                <div class="col-md-2" style="display: none;" id="show_entitled">
+                                                    <input type="number" class="form-control" value="" name="job_life_entitled" id="id_job_life_entitled" placeholder=""/>
                                                 </div>
                                             </div>
 
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Validity</label>
                                                 <div class="col-md-2">
-                                                    <label class="check"><input type="radio" class="iradio" name="validity_radio" value="-1"/> N/A</label>
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" value="-1"/> N/A</label>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="check"><input type="radio" class="iradio" name="validity_radio" checked="checked" value="0"/> Year End</label>
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" checked="checked" value="0"/> Year End</label>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="check"><input type="radio" class="iradio" name="validity_radio"  value="0"/> For month</label>
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" id="for_month"  value="1"/> For month</label>
                                                 </div>
-                                                <div class="col-md-1">
-                                                    <input required type="text" class="form-control" value="" name="month_validity" id="" placeholder=""/>
+                                                <div class="col-md-2" id="show_validity" style="display: none;">
+                                                    <input type="number" class="form-control" value="" name="month_validity" id="id_month_validity" placeholder=""/>
                                                 </div>
                                             </div>
 
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Minimum days</label>
                                                 <div class="col-md-7">
-                                                    <input class="form-control" name="minimum_days"/>
+                                                    <input class="form-control" name="minimum_days" type="number" value="1"/>
                                                 </div>
                                             </div>
                                             <div class="form-group">
 
                                                 <div class="col-md-offset-3 col-md-4">
-                                                    <label class="check"><input type="checkbox" class="icheckbox" name="holiday_skip"/> Holiday skip</label>
+                                                    <label class="check"><input type="checkbox" class="icheckbox_minimal-grey" name="holiday_skip"/> Holiday skip</label>
                                                 </div>
                                             </div>
 
                                             <div class="form-group">
 
                                                 <div class="col-md-offset-3 col-md-2">
-                                                    <label class="check"><input type="checkbox" class="icheckbox" name="is_forward"/> Is Forward</label>
+                                                    <label class="check"><input type="checkbox" class="icheckbox_minimal-grey" name="is_forward"/> Is Forward</label>
                                                 </div>
-                                                <div class="col-md-5">
-                                                    <input class="form-control" placeholder="Forward Validity month" name="is_forward_value"/>
+                                                <div class="col-md-5" id="is_forward_div" style="display: none;">
+                                                    <input class="form-control" placeholder="Forward Validity month" name="is_forward_value" type="number"/>
                                                 </div>
                                             </div>
 
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Precondition</label>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <input class="form-control" value="0" name="precondition"/>
                                                 </div>
+                                                <label class="col-md-3"><p>Month of joblife</p></label>
                                             </div>
 
 
@@ -146,7 +147,7 @@
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Allocation(days)</label>
                                                 <div class="col-md-7">
-                                                    <input required type="text" class="form-control" value="" id="id_amount" name="amount" placeholder="Total allocated days per year"/>
+                                                    <input required type="number" class="form-control" value="" id="id_amount" name="amount" placeholder="Total allocated days per year"/>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -221,4 +222,35 @@
     {% load staticfiles %}
      <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
     <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_leaveCategoryAdd.js' %}"></script>
+    <script type="text/javascript" src="{% static 'attendance/js/plugins/icheck/icheck.min.js' %}"></script>
+    <script>
+
+        $('input[name=entitled_radio]').click(function () {
+            if (this.id == "job_life") {
+                $("#show_entitled").show('fadeIn');
+                $("#id_job_life_entitled").prop('required',true);
+            } else {
+                $("#show_entitled").hide('fadeOut');
+            }
+        });
+
+        $('input[name=validity_radio]').click(function () {
+            if (this.id == "for_month") {
+                $("#show_validity").show('fadeIn');
+                $("#id_month_validity").prop('required', true);
+            } else {
+                $("#show_validity").hide('fadeOut');
+            }
+        });
+
+        $('input[name=is_forward]').change(function () {
+            if ($(this).is(':checked')){
+                $("#is_forward_div").show('fadeIn');
+            } else {
+                $("#is_forward_div").hide('fadeOut');
+            }
+        });
+
+
+    </script>
 {% endblock page_js %}

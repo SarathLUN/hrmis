@@ -82,6 +82,98 @@
                                                     <input required type="text" class="form-control" value="{{ category.get_gender_display }}" name="gender_input" id="id_gender_input" readonly/>
                                                 </div>
                                             </div>
+                                            <div id="only_edit">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Entitled</label>
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="entitled_radio" value="-1" {% if category.entitled == -1 %}checked="checked"{% endif %}/> N/A</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="entitled_radio" value="0" {% if category.entitled == 0 %}checked="checked"{% endif %}/> Yearly</label>
+                                                </div>
+
+                                                {% if category.entitled > 1 %}
+
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="entitled_radio"  value="1" id="job_life" checked/> Job Life</label>
+                                                </div>
+                                                <div class="col-md-2" style="" id="show_entitled">
+                                                    <input type="number" class="form-control" value="{{ category.entitled }}" name="job_life_entitled" id="id_job_life_entitled" placeholder=""/>
+                                                </div>
+
+                                                {% else %}
+
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="entitled_radio"  value="1" id="job_life"/> Job Life</label>
+                                                </div>
+                                                <div class="col-md-2" style="display: none" id="show_entitled">
+                                                    <input type="number" class="form-control" value="" name="job_life_entitled" id="id_job_life_entitled" placeholder=""/>
+                                                </div>
+
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Validity</label>
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" value="-1" {% if category.validity == -1 %}checked="checked"{% endif %}/> N/A</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" value="0" {% if category.validity == 0 %}checked="checked"{% endif %}/> Year End</label>
+                                                </div>
+
+                                                {% if category.validity > 1 %}
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" id="for_month"  value="1" checked/> For month</label>
+                                                </div>
+                                                <div class="col-md-2" id="show_validity" style="">
+                                                    <input type="number" class="form-control" value="{{ category.validity }}" name="month_validity" id="id_month_validity" placeholder=""/>
+                                                </div>
+
+                                                {% else %}
+
+                                                <div class="col-md-2">
+                                                    <label class="check"><input type="radio" class="iradio_minimal-grey" name="validity_radio" id="for_month"  value="1"/> For month</label>
+                                                </div>
+                                                <div class="col-md-2" id="show_validity" style="display: none;">
+                                                    <input type="number" class="form-control" value="" name="month_validity" id="id_month_validity" placeholder=""/>
+                                                </div>
+
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Minimum days</label>
+                                                <div class="col-md-7">
+                                                    <input class="form-control" name="minimum_days" type="number" value="{{ category.minimumdays }}"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+
+                                                <div class="col-md-offset-3 col-md-4">
+                                                    <label class="check"><input type="checkbox" class="icheckbox_minimal-grey" name="holiday_skip" {% if category.holiday_skip %}checked{% endif %}/> Holiday skip</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+
+                                                <div class="col-md-offset-3 col-md-3">
+                                                    <label class="check"><input type="checkbox" class="icheckbox_minimal-grey" name="is_forward" {% if category.is_forward %}checked{% endif %}/> Is Forward</label>
+                                                </div>
+                                                <div class="col-md-4" id="is_forward_div" style="display: none;">
+                                                    <input class="form-control" placeholder="Forward Validity month" name="is_forward_value" type="number"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">Precondition</label>
+                                                <div class="col-md-3">
+                                                    <input class="form-control" value="{{ category.pre_condition }}" name="precondition"/>
+                                                </div>
+                                                <label class="col-md-3"><p>Month of joblife</p></label>
+                                            </div>
+                                            </div>
+                                            <br>
                                             <div class="form-group">
                                                 <label class="col-md-3 control-label">Allocation(days)</label>
                                                 <div class="col-md-7">
@@ -145,6 +237,41 @@
 {% block page_js %}
     {% load staticfiles %}
 
-     <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
-    <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_leaveCategoryEdit.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/bootstrap/bootstrap-select.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/page_customJS/page_leaveCategoryEdit.js' %}"></script>
+        <script type="text/javascript" src="{% static 'attendance/js/plugins/icheck/icheck.min.js' %}"></script>
+        <script>
+        $(document).ready(
+
+        );
+
+
+        $('input[name=entitled_radio]').click(function () {
+            if (this.id == "job_life") {
+                $("#show_entitled").show('fadeIn');
+                $("#id_job_life_entitled").prop('required',true);
+            } else {
+                $("#show_entitled").hide('fadeOut');
+            }
+        });
+
+        $('input[name=validity_radio]').click(function () {
+            if (this.id == "for_month") {
+                $("#show_validity").show('fadeIn');
+                $("#id_month_validity").prop('required', true);
+            } else {
+                $("#show_validity").hide('fadeOut');
+            }
+        });
+
+        $('input[name=is_forward]').change(function () {
+            if ($(this).is(':checked')){
+                $("#is_forward_div").show('fadeIn');
+            } else {
+                $("#is_forward_div").hide('fadeOut');
+            }
+        });
+
+
+    </script>
 {% endblock page_js %}

@@ -33,10 +33,10 @@
                                         <div class="form-group">
                                             <label class="col-md-2 control-label">Select Parent</label>
                                             <div class="col-md-5">
-                                                <select class="form-control " name="parent" id="id_parent">
+                                                <select class="form-control js-example-basic-single" name="parent" id="id_parent">
                                                     <option value="">Select</option>
                                                     {% for list in employee_list %}
-                                                        <option value="{{ list.employee_id.employee_id }}" >{{ list.employee_id.employeeName }}</option>
+                                                        <option value="{{ list.employee_id__employee_id }}" >{{ list.employee_id__employeeName }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -67,12 +67,12 @@
                                             <label class="col-md-1 control-label"></label>
                                             <div class="col-md-4">
 
-                                                <input type="checkbox" class="icheckbox" name="child_list" value="{{ employee.employee_id.employee_id }}" id="checkbox_{{ forloop.counter }}" {% if employee.employee_id_id in old_list %} checked {% endif %}/>
-                                                &nbsp;{{ employee.employee_id.employeeName }}
+                                                <input type="checkbox" class="icheckbox" name="child_list" value="{{ employee.employee_id__employee_id }}" id="checkbox_{{ forloop.counter }}" {% if employee.employee_id__employee_id in old_list %} checked {% endif %}/>
+                                                &nbsp;{{ employee.employee_id__employeeName }}
 
                                             </div>
-                                            <label class="col-md-2 control-label" style="text-align: left;">{{ employee.department_id.departmentName }}</label>
-                                            <label class="col-md-3 control-label" style="text-align: left;">{{ employee.des_id.designation }}</label>
+                                            <label class="col-md-2 control-label" style="text-align: left;">{{ employee.department_id__departmentName }}</label>
+                                            <label class="col-md-3 control-label" style="text-align: left;">{{ employee.des_id__designation }}</label>
 
                                         </div>
                                         {% endfor %}

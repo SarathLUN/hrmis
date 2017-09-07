@@ -14,4 +14,7 @@ urlpatterns = [
     url(r'^(?P<leave_id>[0-9]+)/(?P<request_type>[a-z]+)/adminEditLeave/$', views.admin_leave_edit, name="admin_leave_req_edit"),
     url(r'^(?P<sms_id>[0-9]+)/(?P<request_type>[a-z]+)/adminEditSms/$', views.admin_attendance_sms_edit, name="admin_sms_attendance_edit"),
     url(r'^(?P<leave_id>[0-9]+)/leave_print/$', views.leave_print, name="print_leave"),
+    url(r'^(?P<message>[A-Za-z]+)/specialLeaveApply/$', views.special_leave_apply, name="special_leave_apply"),
+    url(r'^(?P<message>[A-Za-z]+)/business_trip_apply/$', views.business_trip_apply, name="business_trip_apply"),
+    url(r'business_trip_control/$', views.business_trip_control, name="business_trip_control"),
 ]

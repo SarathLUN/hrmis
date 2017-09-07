@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect,JsonResponse, HttpResponse
 from django.core.urlresolvers import reverse
-from .models import LeaveCategory, LeaveAllotment,LeaveHistory, LeaveDetail
+from .models import LeaveCategory, LeaveAllotment,LeaveHistory, LeaveDetail, EmployeeLeaveSetting
 from django.contrib.auth.decorators import login_required
 from hr.models import EmployeeDesignation, Employee
 from attendance.models import Late
@@ -12,10 +12,14 @@ from django.http import JsonResponse
 from HRM.myScript import convert_to_date
 from reportlab.pdfgen import canvas
 from django.core.paginator import Paginator,EmptyPage, PageNotAnInteger
+from dateutil.relativedelta import relativedelta
+from django.template.loader import render_to_string
+from django.contrib import messages
 # Create your views here.
 
 @login_required
 def addLeaveCategoryPage(request, message):
+
 
     category_list = LeaveCategory.objects.filter(isActive=True)
     context = {}
@@ -42,43 +46,81 @@ def addLeaveCategoryPage(request, message):
 @login_required
 def addLeaveCategoryPerfomed(request):
     effective_start_date = convert_to_date(request.POST['start_date'])
-    leave_type = request.POST['leave_type_text']
-    if request.POST['confirmed_by'] == '0':
-        confirmed_by_value = None
-        entitled = request.POST['entitled_radio']
-        validity = request.POST['validity_radio']
-        minimum_days = request.POST['minimum_days']
+    #leave_type = request.POST['leave_type_text']
+    # if request.POST['confirmed_by'] == '0':
+    confirmed_by_value = None
 
-        obj, created = LeaveCategory.objects.get_or_create(name = request.POST['name'],
-                                                  defaults={
-                                                      'amount' : request.POST['amount'],
-                                                      'effective_day_from' : effective_start_date,
-                                                      'description' : request.POST['description'],
-                                                      'isActive' : True,
-                                                      'gender' : request.POST['leave_category_gender'],
-                                                      'insertUser' : request.user.id,
-                                                      'insertDate' : date.today(),
-                                                      'leave_type' : leave_type,
-                                                      'entitled' : entitled
-
-                                                  })
+    if request.POST['entitled_radio'] == '1':
+        entitled = request.POST['job_life_entitled']
 
     else:
-        confirmed_by_value = request.POST['confirmed_by']
+        entitled = request.POST['entitled_radio']
 
-        obj, created = LeaveCategory.objects.get_or_create(name = request.POST['name'],
-                                                  defaults={
-                                                      'amount' : request.POST['amount'],
-                                                      'effective_day_from' : effective_start_date,
-                                                      'description' : request.POST['description'],
-                                                      'confirmed_by_id' : confirmed_by_value,
-                                                      'isActive' : True,
-                                                      'gender' : request.POST['leave_category_gender'],
-                                                      'insertUser' : request.user.id,
-                                                      'insertDate' : date.today(),
-                                                      'leave_type' : leave_type
+    if request.POST['validity_radio'] == '1':
+        validity = request.POST['month_validity']
+    else:
+        validity = request.POST['validity_radio']
 
-                                                  })
+    minimum_days = request.POST['minimum_days']
+
+    if 'holiday_skip' in request.POST:
+        holiday_skip = True
+    else:
+        holiday_skip = False
+
+    if 'is_forward' in request.POST:
+        is_forward = True
+        forward_validity = request.POST['is_forward_value']
+    else:
+        is_forward = False
+        forward_validity = 0
+
+    precondition = request.POST['precondition']
+
+    confirmed_by_value = request.POST['confirmed_by']
+    if confirmed_by_value == "0":
+        confirmed_by_value = None
+
+
+
+
+    obj, created = LeaveCategory.objects.get_or_create(name = request.POST['name'],
+                                              defaults={
+                                                  'amount' : request.POST['amount'],
+                                                  'effective_day_from' : effective_start_date,
+                                                  'description' : request.POST['description'],
+                                                  'isActive' : True,
+                                                  'gender' : request.POST['leave_category_gender'],
+                                                  'insertUser' : request.user.id,
+                                                  'insertDate' : date.today(),
+                                                  #'leave_type' : leave_type,
+                                                  'entitled' : entitled,
+                                                  'validity' : validity,
+                                                  'minimumdays' : minimum_days,
+                                                  'holiday_skip' : holiday_skip,
+                                                  'is_forward' : is_forward,
+                                                  'forward_validity' : forward_validity,
+                                                  'pre_condition' : precondition,
+                                                  'confirmed_by_id' : confirmed_by_value,
+
+                                              })
+
+    # else:
+    #     confirmed_by_value = request.POST['confirmed_by']
+    #
+    #     obj, created = LeaveCategory.objects.get_or_create(name = request.POST['name'],
+    #                                               defaults={
+    #                                                   'amount' : request.POST['amount'],
+    #                                                   'effective_day_from' : effective_start_date,
+    #                                                   'description' : request.POST['description'],
+    #                                                   'confirmed_by_id' : confirmed_by_value,
+    #                                                   'isActive' : True,
+    #                                                   'gender' : request.POST['leave_category_gender'],
+    #                                                   'insertUser' : request.user.id,
+    #                                                   'insertDate' : date.today(),
+    #                                                   'leave_type' : leave_type
+    #
+    #                                               })
 
     return redirect('leave:addLeaveCategoryPage', message=created)
 
@@ -229,9 +271,10 @@ def applyLeave(request,message):
         obj = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
         context['employee_info'] = obj
 
+
         policy = True
 
-        leaveCategory_obj_list = LeaveCategory.objects.filter(isActive=True, gender__in=[request.user.employeeuser.employee.gender,'0'])
+        leaveCategory_obj_list = LeaveCategory.objects.filter(isActive=True, gender__in=[request.user.employeeuser.employee.gender,'0'], entitled='0', validity='0')
         leave_balance_list = []
 
         for category in leaveCategory_obj_list:
@@ -304,7 +347,7 @@ def applyLeave(request,message):
 
 
             for d in range(0,dayCount):
-                if WeeklyHoliday.objects.filter(effectiveFrom__lte=checkDate, effectiveEnd__gte=checkDate, dayNum=checkDate.isoweekday()).exists() or YearlyHoliday.objects.filter(date=checkDate).exists():
+                if WeeklyHoliday.objects.filter(effectiveFrom__lte=checkDate, effectiveEnd__gte=checkDate, dayNum=checkDate.isoweekday(), active_location=obj.location_id).exists() or YearlyHoliday.objects.filter(date=checkDate).exists():
                     totalDays = totalDays - 1
                 '''for weekend in weekend_list:
                     if checkDate.isoweekday() == weekend.dayNum:
@@ -321,11 +364,395 @@ def applyLeave(request,message):
                       #  print(totalDays)
                         break
                 '''
-                if LeaveHistory.objects.filter(employee_id=request.user.employeeuser.employee, date_from__lte=checkDate, date_to__gte=checkDate, isActive=True).exists():
+                if LeaveHistory.objects.filter(employee_id=request.user.employeeuser.employee, date_from__lte=checkDate, date_to__gte=checkDate, isActive=True, endorsement__in=['1','3','0']).exists():
                     duplicate_check = True
                     message = 'duplicate'
 
                 checkDate = checkDate + timedelta(days=1)
+
+            if totalDays > leave_balance:
+                balance_check = True
+
+
+            if (totalDays == int(request.POST['amount'])) and (duplicate_check == False) and (balance_check == False):
+                if confirmed_by != '0':
+                    leave_obj = LeaveHistory(date_from = startDate,
+                                             date_to = endDate,
+                                             count = totalDays,
+                                             employee_id = obj.employee_id,
+                                             endorsed_by = obj.supervisor,
+                                             confirmed_by_id = confirmed_by,
+                                             type = get_object_or_404(LeaveCategory,pk=request.POST['type']),
+                                             endorsement = '0',
+                                             isActive = True,
+                                             description = request.POST['reason'],
+                                             insertUser = request.user.id,
+                                             insertDate = date.today())
+                    leave_obj.save()
+
+                else:
+                    leave_obj = LeaveHistory(date_from = startDate,
+                                             date_to = endDate,
+                                             count = totalDays,
+                                             employee_id = obj.employee_id,
+                                             endorsed_by = obj.supervisor,
+                                             type = get_object_or_404(LeaveCategory,pk=request.POST['type']),
+                                             endorsement = '0',
+                                             isActive = True,
+                                             description = request.POST['reason'],
+                                             insertUser = request.user.id,
+                                             insertDate = date.today())
+                    leave_obj.save()
+
+                dayCount = abs(endDate - startDate).days + 1
+                totalDays = dayCount
+                dateValue = startDate
+
+                for count in range(0,dayCount):
+                    if (YearlyHoliday.objects.filter(date=dateValue).exists() == False) and (WeeklyHoliday.objects.filter(effectiveFrom__lte=dateValue, effectiveEnd__gte=dateValue, dayNum=dateValue.isoweekday(), active_location=obj.location_id).exists() == False):
+                        new_leave_details_object = LeaveDetail(date = dateValue,
+                                                               isActive = True,
+                                                               leave_id = leave_obj,
+                                                               insertUser = request.user.id,
+                                                               insertDate = date.today())
+                        new_leave_details_object.save()
+
+                    dateValue = dateValue + timedelta(days=1)
+
+                try:
+                    leave_balance = LeaveAllotment.objects.filter(isActive=True, employee_id=leave_obj.employee_id, leave_id__type__id = leave_obj.type_id, year = leave_obj.date_from.year).latest('id')
+
+                    new_balance = leave_balance.balance - leave_obj.count
+                    leave_balance.updateUser = request.user.id
+                    leave_balance.updateDate = date.today()
+                    leave_balance.save()
+                    new_leave_balance_obj = LeaveAllotment(balance = new_balance,
+                                                           employee_id = leave_obj.employee_id,
+                                                           leave_id = leave_obj,
+                                                           isActive = True,
+                                                           year = leave_obj.date_from.year,
+                                                           insertUser = request.user.id,
+                                                           insertDate = date.today(),
+                                                           insertType = 'insert',
+                                                           project = '1'
+                                                           )
+
+                    new_leave_balance_obj.save()
+                except ObjectDoesNotExist:
+                    if leave_obj.employee_id.joiningDate.year == date.today().year:
+                        allocated_balance = round((leave_obj.type.amount / 365) * (365 - leave_obj.employee_id.joiningDate.timetuple().tm_yday))
+                        new_balance = allocated_balance - leave_obj.count
+                    else:
+                        new_balance = leave_obj.type.amount - leave_obj.count
+
+                    new_leave_balance_obj = LeaveAllotment(balance = new_balance,
+                                                           employee_id = leave_obj.employee_id,
+                                                           leave_id = leave_obj,
+                                                           isActive = True,
+                                                           year = leave_obj.date_from.year,
+                                                           insertUser = request.user.id,
+                                                           insertDate = date.today(),
+
+                                                           insertType = 'insert',
+                                                           project = '1')
+                    new_leave_balance_obj.save()
+
+
+                message = 'applied'
+
+            elif balance_check == True:
+                message = 'extra'
+
+            elif duplicate_check == True:
+                message = 'duplicate'
+            else:
+                message = 'miscount'
+
+            return redirect('leave:applyLeave', message=message)
+
+        pending_list = LeaveHistory.objects.filter(employee_id=obj.employee_id, endorsement='0' )
+        context['pending_list'] = pending_list
+
+        if message == 'add':
+            context['form_message'] = ''
+        elif message == 'extra':
+            context['form_message'] = 'You cannot apply for more days than your balance'
+        elif message == 'duplicate':
+            context['form_message'] = 'Duplicate Entry!! Already Applied for the date'
+        elif message == 'applied':
+            context['form_message'] = 'Leave Application is submitted successfully to ' + obj.supervisor.get_gender_display() + ' ' + obj.supervisor.employeeName
+        elif message == 'miscount':
+            context['form_message'] = 'Day Calculation is not Correct'
+        else:
+            context['form_message'] = 'Some error Occured'
+
+
+    except ObjectDoesNotExist:
+        context['error_message'] = '!!!  This page is for Employee  !!!'
+
+
+
+    return render(request, 'leave/applyLeave.html', context)
+
+
+@login_required
+def special_leave_apply(request,message):
+
+    context = {}
+    error_message = ''
+
+    if request.is_ajax():
+        data = {}
+        apex_context = {}
+        ajax_type = request.POST.get('ajax_type')
+        eligible = False
+
+        if ajax_type=='1':
+            leave_type = request.POST.get('leave_type')
+            supervisor = ''
+            try:
+                leave_obj = LeaveCategory.objects.get(id=leave_type)
+                apex_context['leave_obj'] = leave_obj
+                try:
+                    emp_details = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+                    join_datetime = datetime.combine(emp_details.employee_id.joiningDate, datetime.min.time())
+                    eligible = False
+                    apply_validity = False
+                    current_validity = False
+                    #print(join_datetime)
+                    if (datetime.now() + relativedelta(months=-leave_obj.pre_condition)) > join_datetime:
+                        # print(datetime.now() + relativedelta(months=-leave_obj.pre_condition))
+                        # print(datetime.now())
+                        # print(emp_details.employee_id.joiningDate)
+                        eligible = True
+                        data['eligible_msg'] = eligible
+
+                        #check the availability of the leave
+                        apply_validity = True
+                        try:
+                            leave_count_obj = LeaveAllotment.objects.filter(leave_id__type__id = leave_obj.id, isActive=True, employee_id=emp_details.employee_id.employee_id).latest('id')
+                            if leave_count_obj.frequency_count <= leave_obj.entitled:
+                                apply_validity = True
+                                # print(leave_count_obj.leave_id.date_from + relativedelta(months=+leave_obj.validity))
+                                # print(leave_obj.validity)
+                                if (leave_count_obj.leave_id.date_from + relativedelta(months=+leave_obj.validity) > date.today()) and (leave_count_obj.balance) > 0:
+                                    current_validity = True
+                                    frequency_number = leave_count_obj.frequency_count
+                                    data['frequency_number'] = frequency_number
+                                    data['data_current_leave_balance'] = leave_count_obj.balance
+                                    apex_context['current_leave_balance'] = leave_count_obj.balance
+
+                            else:
+                                apply_validity = False
+                        except ObjectDoesNotExist:
+                            leave_count_obj = ''
+                            apply_validity = True
+                    else:
+                        eligible = False
+                        data['eligible_msg'] = eligible
+
+                    html = render_to_string('leave/apex_special_leave_display_table.html',apex_context)
+                    data['html'] = html
+
+                    data['apply_validity'] = apply_validity
+                    data['current_validity'] = current_validity
+
+                except:
+                    emp_details = 0
+
+                if leave_obj.confirmed_by != None:
+                    ceo_obj = EmployeeDesignation.objects.filter(employee_id=leave_obj.confirmed_by, isActive=True).order_by('-effective_date_start')[0]
+                    ajax_message = "This application will also be sent to " + ceo_obj.employee_id.get_gender_display() + " " + ceo_obj.employee_id.employeeName + " for confirmation"
+                    ajax_description = leave_obj.description
+                    supervisor = ceo_obj.employee_id.employee_id
+
+                else:
+                    #obj = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+                    ajax_message = ''
+                    supervisor = '0'
+                    ajax_description = ''
+
+
+            except ObjectDoesNotExist:
+                pass
+
+            data['supervisor'] = supervisor
+            data['ajax_message'] = ajax_message
+            data['ajax_description'] = ajax_description
+
+            # data = {
+            #     'test' : 1
+            # }
+
+
+        else:
+
+            startDate = datetime.strptime(request.POST.get('start_date'), "%Y/%m/%d")
+            checkDate = startDate
+            endDate = startDate - timedelta(days=1)
+            total_amount = int(request.POST.get('total_amount'))
+
+            leave_type = request.POST.get('leave_type')
+            try:
+                leave_obj = LeaveCategory.objects.get(id=leave_type)
+            except:
+                pass
+
+            try:
+                emp_details = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+
+            except:
+                emp_details = 0
+
+            if leave_obj.holiday_skip == True:
+                endDate = startDate + timedelta(days=(total_amount-1))
+            else:
+                while total_amount:
+                    if WeeklyHoliday.objects.filter(effectiveFrom__lte=checkDate, effectiveEnd__gte=checkDate, dayNum=checkDate.isoweekday(), active_location=emp_details.location_id).exists() or YearlyHoliday.objects.filter(date=checkDate).exists():
+                        endDate = endDate + timedelta(days=1)
+                    else:
+                        endDate = endDate + timedelta(days=1)
+                        total_amount -= 1
+
+                    checkDate = checkDate + timedelta(days=1)
+
+            '''
+            weekend_list = WeeklyHoliday.objects.filter(isActive=True)
+            holiday_list = YearlyHoliday.objects.filter(date__range=(startDate,endDate))
+
+            for d in range(0,dayCount):
+                for weekend in weekend_list:
+                    if checkDate.isoweekday() == weekend.dayNum:
+                        totalDays = totalDays - 1
+                      #  print(checkDate.date())
+                       # print(totalDays)
+                        break
+
+
+                for holiday in holiday_list:
+                    if checkDate.date() == holiday.date:
+                        totalDays = totalDays - 1
+                      #  print(checkDate.date())
+                      #  print(totalDays)
+                        break
+
+                checkDate = checkDate + timedelta(days=1)
+
+                '''
+
+            data['end_date'] = endDate.strftime("%Y/%m/%d")
+
+        return JsonResponse(data)
+
+
+    try:
+        obj = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+        context['employee_info'] = obj
+        # print(obj.employee_id.employeeName)
+        join_datetime = datetime.combine(obj.employee_id.joiningDate, datetime.min.time())
+
+        leaveCategory_obj_list = LeaveCategory.objects.filter(isActive=True, gender__in=[request.user.employeeuser.employee.gender,'0']).exclude(entitled__in=[0, -1])
+
+        epm_leave_setting_obj = EmployeeLeaveSetting.objects.filter(employee=obj.employee_id)
+        leave_balance_list = []
+
+        for category in leaveCategory_obj_list:
+
+            allocated_balance = category.amount
+            if (datetime.now() + relativedelta(months=-category.pre_condition)) > join_datetime:
+                # print(datetime.now() + relativedelta(months=-leave_obj.pre_condition))
+                # print(datetime.now())
+                # print(emp_details.employee_id.joiningDate)
+                eligible = True
+
+                # allotment_obj = LeaveAllotment.objects.filter(leave_id__type=category).latest('id')
+                #
+                # print(allotment_obj.balance)
+
+
+
+            try:
+
+                leave_balance = LeaveAllotment.objects.filter(leave_id__type__id = category.id, isActive=True, employee_id=obj.employee_id, year=date.today().year).latest('id')
+
+                leave_balance_list.append({'id' : category.id, 'name' : category.name, 'balance' : leave_balance.balance})
+
+            except ObjectDoesNotExist:
+
+                leave_balance_list.append({'id' : category.id, 'name' : category.name, 'balance' : allocated_balance})
+
+        context['balance_list'] = leave_balance_list
+        context['leave_category'] = leaveCategory_obj_list
+
+        # retriving leave application history
+        leave_application_histroy = LeaveHistory.objects.filter(employee_id=request.user.employeeuser.employee, date_from__year=date.today().year, isActive=True).order_by('-id')
+        context['leave_application_history'] = leave_application_histroy
+
+        if EmployeeDesignation.objects.filter(employee_id=obj.supervisor, isActive=True).exists():
+            context['permission'] = True
+
+        else:
+            context['permission'] = False
+
+
+        if request.method == "POST":
+
+            startDate = datetime.strptime(request.POST['start_date'], "%Y/%m/%d")
+            endDate = datetime.strptime(request.POST['hidden_to_date'], "%Y/%m/%d")
+            dayCount = abs(endDate - startDate).days + 1
+            totalDays = dayCount
+            checkDate = startDate
+            duplicate_check = False
+            balance_check = False
+            confirmed_by = request.POST['hiddhen_confirmed_by']
+            message = {}
+            frequency_count = 1
+
+            weekend_list = WeeklyHoliday.objects.filter(isActive=True)
+            holiday_list = YearlyHoliday.objects.filter(date__range=(startDate,endDate))
+
+            leave_type = get_object_or_404(LeaveCategory,pk=request.POST['type'])
+            try:
+
+                leave_balance_obj = LeaveAllotment.objects.filter(isActive=True, employee_id=request.user.employeeuser.employee_id, leave_id__type__id = leave_type.id, year = startDate.year).latest('id')
+                leave_balance = leave_balance_obj.balance
+                if ('validity_radio' in request.POST) and (request.POST['validity_radio']=='1'):
+                    frequency_count = leave_balance_obj.frequency_count
+            except ObjectDoesNotExist:
+
+                joining_date = obj.employee_id.joiningDate.year
+                if joining_date == date.today().year :
+                    leave_balance = round((leave_type.amount / 365) * (365 - obj.employee_id.joiningDate.timetuple().tm_yday))
+                else:
+                    leave_balance = leave_type.amount
+
+
+            if leave_type.holiday_skip == True:
+                totalDays = int(request.POST['amount'])
+            else:
+                for d in range(0,dayCount):
+                    if WeeklyHoliday.objects.filter(effectiveFrom__lte=checkDate, effectiveEnd__gte=checkDate, dayNum=checkDate.isoweekday(), active_location=obj.location_id).exists() or YearlyHoliday.objects.filter(date=checkDate).exists():
+                        totalDays = totalDays - 1
+                    '''for weekend in weekend_list:
+                        if checkDate.isoweekday() == weekend.dayNum:
+                            totalDays = totalDays - 1
+                          #  print(checkDate.date())
+                           # print(totalDays)
+                            break
+
+
+                    for holiday in holiday_list:
+                        if checkDate.date() == holiday.date:
+                            totalDays = totalDays - 1
+                          #  print(checkDate.date())
+                          #  print(totalDays)
+                            break
+                    '''
+                    if LeaveHistory.objects.filter(employee_id=request.user.employeeuser.employee, date_from__lte=checkDate, date_to__gte=checkDate, isActive=True, endorsement__in=['1','3','0']).exists():
+                        duplicate_check = True
+                        message = 'duplicate'
+
+                    checkDate = checkDate + timedelta(days=1)
 
             if totalDays > leave_balance:
                 balance_check = True
@@ -391,7 +818,8 @@ def applyLeave(request,message):
                                                            insertUser = request.user.id,
                                                            insertDate = date.today(),
                                                            insertType = 'insert',
-                                                           project = '1'
+                                                           project = '1',
+                                                           frequency_count = frequency_count
                                                            )
 
                     new_leave_balance_obj.save()
@@ -410,7 +838,8 @@ def applyLeave(request,message):
                                                            insertUser = request.user.id,
                                                            insertDate = date.today(),
                                                            insertType = 'insert',
-                                                           project = '1')
+                                                           project = '1',
+                                                           frequency_count = frequency_count)
                     new_leave_balance_obj.save()
 
 
@@ -424,7 +853,7 @@ def applyLeave(request,message):
             else:
                 message = 'miscount'
 
-            return redirect('leave:applyLeave', message=message)
+            return redirect('leave:special_leave_apply', message=message)
 
         pending_list = LeaveHistory.objects.filter(employee_id=obj.employee_id, endorsement='0' )
         context['pending_list'] = pending_list
@@ -447,8 +876,472 @@ def applyLeave(request,message):
         context['error_message'] = '!!!  This page is for Employee  !!!'
 
 
-    return render(request, 'leave/applyLeave.html', context)
+    return render(request, 'leave/special_leave_apply.html', context)
 
+@login_required
+def special_leave_apply_new(request):
+    context = {}
+
+    try:
+        obj = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+
+        #check if supervisor is assainged
+        if EmployeeDesignation.objects.filter(employee_id=obj.supervisor, isActive=True).exists():
+            context['permission'] = True
+
+        else:
+            context['permission'] = False
+
+
+
+    except ObjectDoesNotExist:
+        context['error_message'] = "This page is for Employee User"
+
+
+
+    return render(request, 'leave/special_leave_apply.html', context)
+
+
+@login_required
+def business_trip_control(request):
+
+    context = {}
+
+    leave_category_list = LeaveCategory.objects.filter(isActive=True, entitled='-1', validity='-1')
+    employee_list = Employee.objects.filter(isActive=True, isDelete=False).order_by('employeeName')
+    active_setting_list = EmployeeLeaveSetting.objects.filter(isActive=True,frequency__gt=0).order_by('employee__employeeName')
+    context['active_setting_list'] = active_setting_list
+
+    context['leave_category_list'] = leave_category_list
+    context['employee_list'] = employee_list
+
+    if request.method == "POST":
+        selected_emp = request.POST.getlist('emp_list')
+        leave_category = request.POST['category']
+        frequency = request.POST['frequency']
+
+        for list in selected_emp:
+            Obj, created = EmployeeLeaveSetting.objects.get_or_create(
+                employee_id=list,
+                leave_category_id=leave_category,
+                isActive=True,
+                defaults= {
+                    'frequency' : frequency,
+                    'insertUser' : request.user.id,
+                    'insertDate' : date.today(),
+                    'project' : '1',
+                }
+            )
+
+            if created:
+                messages.success(request, "Successfully Inserted!!")
+            else:
+                messages.error(request, "Already has an Active Entry for the User, Not Created!")
+
+
+    return render(request, 'leave/business_trip_control.html', context)
+
+@login_required
+def business_trip_apply(request, message):
+    context = {}
+    error_message = ''
+
+    if request.is_ajax():
+        data = {}
+        apex_context = {}
+        ajax_type = request.POST.get('ajax_type')
+        eligible = False
+
+        if ajax_type=='1':
+            leave_type = request.POST.get('leave_type')
+            supervisor = ''
+
+            try:
+                leave_obj = LeaveCategory.objects.get(id=leave_type)
+                apex_context['leave_obj'] = leave_obj
+                try:
+                    emp_details = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+                    join_datetime = datetime.combine(emp_details.employee_id.joiningDate, datetime.min.time())
+                    eligible = False
+                    apply_validity = False
+                    current_validity = False
+                    #print(join_datetime)
+                    if (datetime.now() + relativedelta(months=-leave_obj.pre_condition)) > join_datetime:
+                        # print(datetime.now() + relativedelta(months=-leave_obj.pre_condition))
+                        # print(datetime.now())
+                        # print(emp_details.employee_id.joiningDate)
+                        eligible = True
+                        data['eligible_msg'] = eligible
+
+                        #check the availability of the leave
+                        apply_validity = True
+                        available_frequency = EmployeeLeaveSetting.objects.filter(employee=emp_details.employee_id.employee_id, isActive=True, leave_category=leave_obj)
+                        apex_context['frequency'] = available_frequency[0].frequency
+                        print(available_frequency[0].frequency)
+                        # taken_business_trip_count = LeaveHistory.objects.filter(type=leave_obj, isActive=True, insertDate__gte=available_frequency[0].insertDate).count()
+                        #
+                        # remaining_frequency = available_frequency[0].frequency - taken_business_trip_count
+                        # apex_context['remaining_frequency'] = remaining_frequency
+                        try:
+                            leave_count_obj = LeaveAllotment.objects.filter(leave_id__type__id = leave_obj.id, isActive=True, employee_id=emp_details.employee_id.employee_id).latest('id')
+                            if leave_count_obj.frequency_count <= leave_obj.entitled:
+
+                                apply_validity = True
+                                # print(leave_count_obj.leave_id.date_from + relativedelta(months=+leave_obj.validity))
+                                # print(leave_obj.validity)
+                                if (leave_count_obj.leave_id.date_from + relativedelta(months=+leave_obj.validity) > date.today()) and (leave_count_obj.balance) > 0:
+                                    current_validity = True
+                                    frequency_number = leave_count_obj.frequency_count
+                                    data['frequency_number'] = frequency_number
+                                    data['data_current_leave_balance'] = leave_count_obj.balance
+
+                                    apex_context['current_leave_balance'] = leave_count_obj.balance
+
+                            else:
+                                apply_validity = False
+                        except ObjectDoesNotExist:
+                            leave_count_obj = ''
+                            apply_validity = True
+                    else:
+                        eligible = False
+                        data['eligible_msg'] = eligible
+
+                    html = render_to_string('leave/apex_special_leave_display_table.html',apex_context)
+                    data['html'] = html
+
+                    data['apply_validity'] = apply_validity
+                    data['current_validity'] = current_validity
+
+                except:
+                    emp_details = 0
+
+                if leave_obj.confirmed_by != None:
+                    ceo_obj = EmployeeDesignation.objects.filter(employee_id=leave_obj.confirmed_by, isActive=True).order_by('-effective_date_start')[0]
+                    ajax_message = "This application will also be sent to " + ceo_obj.employee_id.get_gender_display() + " " + ceo_obj.employee_id.employeeName + " for confirmation"
+                    ajax_description = leave_obj.description
+                    supervisor = ceo_obj.employee_id.employee_id
+
+                else:
+                    #obj = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+                    ajax_message = ''
+                    supervisor = '0'
+                    ajax_description = ''
+
+
+            except ObjectDoesNotExist:
+                pass
+
+            data['supervisor'] = supervisor
+            data['ajax_message'] = ajax_message
+            data['ajax_description'] = ajax_description
+
+            # data = {
+            #     'test' : 1
+            # }
+
+
+        else:
+
+            startDate = datetime.strptime(request.POST.get('start_date'), "%Y/%m/%d")
+            checkDate = startDate
+            endDate = startDate - timedelta(days=1)
+            total_amount = int(request.POST.get('total_amount'))
+
+            leave_type = request.POST.get('leave_type')
+            try:
+                leave_obj = LeaveCategory.objects.get(id=leave_type)
+            except:
+                pass
+
+            try:
+                emp_details = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+
+            except:
+                emp_details = 0
+
+            if leave_obj.holiday_skip == True:
+                endDate = startDate + timedelta(days=(total_amount-1))
+            else:
+                while total_amount:
+                    if WeeklyHoliday.objects.filter(effectiveFrom__lte=checkDate, effectiveEnd__gte=checkDate, dayNum=checkDate.isoweekday(), active_location=emp_details.location_id).exists() or YearlyHoliday.objects.filter(date=checkDate).exists():
+                        endDate = endDate + timedelta(days=1)
+                    else:
+                        endDate = endDate + timedelta(days=1)
+                        total_amount -= 1
+
+                    checkDate = checkDate + timedelta(days=1)
+
+            '''
+            weekend_list = WeeklyHoliday.objects.filter(isActive=True)
+            holiday_list = YearlyHoliday.objects.filter(date__range=(startDate,endDate))
+
+            for d in range(0,dayCount):
+                for weekend in weekend_list:
+                    if checkDate.isoweekday() == weekend.dayNum:
+                        totalDays = totalDays - 1
+                      #  print(checkDate.date())
+                       # print(totalDays)
+                        break
+
+
+                for holiday in holiday_list:
+                    if checkDate.date() == holiday.date:
+                        totalDays = totalDays - 1
+                      #  print(checkDate.date())
+                      #  print(totalDays)
+                        break
+
+                checkDate = checkDate + timedelta(days=1)
+
+                '''
+
+            data['end_date'] = endDate.strftime("%Y/%m/%d")
+
+        return JsonResponse(data)
+
+
+    try:
+        obj = EmployeeDesignation.objects.get(employee_id = request.user.employeeuser.employee, isActive=True)
+        context['employee_info'] = obj
+        print(obj.employee_id.employeeName)
+        join_datetime = datetime.combine(obj.employee_id.joiningDate, datetime.min.time())
+
+        leaveCategory_obj_list = LeaveCategory.objects.filter(isActive=True, gender__in=[request.user.employeeuser.employee.gender,'0'], entitled='-1', validity='-1')
+        #leaveCategory_obj_list = LeaveCategory.objects.filter(isActive=True)
+
+        epm_leave_setting_obj = EmployeeLeaveSetting.objects.filter(employee=obj.employee_id, isActive=True)
+        leave_balance_list = []
+
+        for category in leaveCategory_obj_list:
+
+
+            if EmployeeLeaveSetting.objects.filter(employee=obj.employee_id, isActive=True, leave_category=category, frequency__gt=0).exists():
+
+                available_frequency = EmployeeLeaveSetting.objects.filter(employee=obj.employee_id, isActive=True, leave_category=category).values('frequency')
+                allocated_balance = category.amount
+                if (datetime.now() + relativedelta(months=-category.pre_condition)) > join_datetime:
+                    # print(datetime.now() + relativedelta(months=-leave_obj.pre_condition))
+                    # print(datetime.now())
+                    # print(emp_details.employee_id.joiningDate)
+                    eligible = True
+
+                    # allotment_obj = LeaveAllotment.objects.filter(leave_id__type=category).latest('id')
+                    #
+                    # print(allotment_obj.balance)
+
+
+
+                try:
+
+                    leave_balance = LeaveAllotment.objects.filter(leave_id__type__id = category.id, isActive=True, employee_id=obj.employee_id, year=date.today().year).latest('id')
+
+                    leave_balance_list.append({'id' : category.id, 'name' : category.name, 'balance' : leave_balance.balance, 'frequency' : available_frequency})
+
+                except ObjectDoesNotExist:
+
+                    leave_balance_list.append({'id' : category.id, 'name' : category.name, 'balance' : allocated_balance, 'frequency' : available_frequency})
+
+        context['balance_list'] = leave_balance_list
+        context['leave_category'] = leaveCategory_obj_list
+
+        # retriving leave application history
+        leave_application_histroy = LeaveHistory.objects.filter(employee_id=request.user.employeeuser.employee, date_from__year=date.today().year, isActive=True).order_by('-id')
+        context['leave_application_history'] = leave_application_histroy
+
+        if EmployeeDesignation.objects.filter(employee_id=obj.supervisor, isActive=True).exists():
+            context['permission'] = True
+        else:
+            context['permission'] = False
+
+
+        if request.method == "POST":
+
+            startDate = datetime.strptime(request.POST['start_date'], "%Y/%m/%d")
+            endDate = datetime.strptime(request.POST['hidden_to_date'], "%Y/%m/%d")
+            dayCount = abs(endDate - startDate).days + 1
+            totalDays = dayCount
+            checkDate = startDate
+            duplicate_check = False
+            balance_check = False
+            confirmed_by = request.POST['hiddhen_confirmed_by']
+            message = {}
+            frequency_count = 1
+
+            weekend_list = WeeklyHoliday.objects.filter(isActive=True)
+            holiday_list = YearlyHoliday.objects.filter(date__range=(startDate,endDate))
+
+            leave_type = get_object_or_404(LeaveCategory,pk=request.POST['type'])
+            try:
+
+                leave_balance_obj = LeaveAllotment.objects.filter(isActive=True, employee_id=request.user.employeeuser.employee_id, leave_id__type__id = leave_type.id, year = startDate.year).latest('id')
+                leave_balance = leave_balance_obj.balance
+                if ('validity_radio' in request.POST) and (request.POST['validity_radio']=='1'):
+                    frequency_count = leave_balance_obj.frequency_count
+            except ObjectDoesNotExist:
+
+                joining_date = obj.employee_id.joiningDate.year
+                if joining_date == date.today().year :
+                    leave_balance = round((leave_type.amount / 365) * (365 - obj.employee_id.joiningDate.timetuple().tm_yday))
+                else:
+                    leave_balance = leave_type.amount
+
+
+            if leave_type.holiday_skip == True:
+                totalDays = int(request.POST['amount'])
+            else:
+                for d in range(0,dayCount):
+                    if WeeklyHoliday.objects.filter(effectiveFrom__lte=checkDate, effectiveEnd__gte=checkDate, dayNum=checkDate.isoweekday(), active_location=obj.location_id).exists() or YearlyHoliday.objects.filter(date=checkDate).exists():
+                        totalDays = totalDays - 1
+                    '''for weekend in weekend_list:
+                        if checkDate.isoweekday() == weekend.dayNum:
+                            totalDays = totalDays - 1
+                          #  print(checkDate.date())
+                           # print(totalDays)
+                            break
+
+
+                    for holiday in holiday_list:
+                        if checkDate.date() == holiday.date:
+                            totalDays = totalDays - 1
+                          #  print(checkDate.date())
+                          #  print(totalDays)
+                            break
+                    '''
+                    if LeaveHistory.objects.filter(employee_id=request.user.employeeuser.employee, date_from__lte=checkDate, date_to__gte=checkDate, isActive=True, endorsement__in=['1','3','0']).exists():
+                        duplicate_check = True
+                        message = 'duplicate'
+
+                    checkDate = checkDate + timedelta(days=1)
+
+            # if totalDays > leave_balance:
+            #     balance_check = True
+
+
+            if (totalDays == int(request.POST['amount'])) and (duplicate_check == False) and (balance_check == False):
+                if confirmed_by != '0':
+                    leave_obj = LeaveHistory(date_from = startDate,
+                                             date_to = endDate,
+                                             count = totalDays,
+                                             employee_id = obj.employee_id,
+                                             endorsed_by = obj.supervisor,
+                                             confirmed_by_id = confirmed_by,
+                                             type = get_object_or_404(LeaveCategory,pk=request.POST['type']),
+                                             endorsement = '0',
+                                             isActive = True,
+                                             description = request.POST['reason'],
+                                             insertUser = request.user.id,
+                                             insertDate = date.today())
+                    leave_obj.save()
+
+                else:
+                    leave_obj = LeaveHistory(date_from = startDate,
+                                             date_to = endDate,
+                                             count = totalDays,
+                                             employee_id = obj.employee_id,
+                                             endorsed_by = obj.supervisor,
+                                             type = get_object_or_404(LeaveCategory,pk=request.POST['type']),
+                                             endorsement = '0',
+                                             isActive = True,
+                                             description = request.POST['reason'],
+                                             insertUser = request.user.id,
+                                             insertDate = date.today())
+                    leave_obj.save()
+
+                dayCount = abs(endDate - startDate).days + 1
+                totalDays = dayCount
+                dateValue = startDate
+
+                for count in range(0,dayCount):
+                    if (YearlyHoliday.objects.filter(date=dateValue).exists() == False) and  (WeeklyHoliday.objects.filter(effectiveFrom__lte=dateValue, effectiveEnd__gte=dateValue, dayNum=dateValue.isoweekday()).exists() == False):
+                        new_leave_details_object = LeaveDetail(date = dateValue,
+                                                               isActive = True,
+                                                               leave_id = leave_obj,
+                                                               insertUser = request.user.id,
+                                                               insertDate = date.today())
+                        new_leave_details_object.save()
+
+                    dateValue = dateValue + timedelta(days=1)
+
+                try:
+                    emp_set_obj = EmployeeLeaveSetting.objects.get(employee=obj.employee_id, isActive=True, leave_category=leave_obj.type)
+                    emp_set_obj.frequency = emp_set_obj.frequency - 1
+                    emp_set_obj.save()
+                except:
+                    pass
+
+                # try:
+                #     leave_balance = LeaveAllotment.objects.filter(isActive=True, employee_id=leave_obj.employee_id, leave_id__type__id = leave_obj.type_id, year = leave_obj.date_from.year).latest('id')
+                #
+                #     new_balance = leave_balance.balance - leave_obj.count
+                #     leave_balance.updateUser = request.user.id
+                #     leave_balance.updateDate = date.today()
+                #     leave_balance.save()
+                #     new_leave_balance_obj = LeaveAllotment(balance = new_balance,
+                #                                            employee_id = leave_obj.employee_id,
+                #                                            leave_id = leave_obj,
+                #                                            isActive = True,
+                #                                            year = leave_obj.date_from.year,
+                #                                            insertUser = request.user.id,
+                #                                            insertDate = date.today(),
+                #                                            insertType = 'insert',
+                #                                            project = '1',
+                #                                            frequency_count = frequency_count
+                #                                            )
+                #
+                #     new_leave_balance_obj.save()
+                # except ObjectDoesNotExist:
+                #     if leave_obj.employee_id.joiningDate.year == date.today().year:
+                #         allocated_balance = round((leave_obj.type.amount / 365) * (365 - leave_obj.employee_id.joiningDate.timetuple().tm_yday))
+                #         new_balance = allocated_balance - leave_obj.count
+                #     else:
+                #         new_balance = leave_obj.type.amount - leave_obj.count
+                #
+                #     new_leave_balance_obj = LeaveAllotment(balance = new_balance,
+                #                                            employee_id = leave_obj.employee_id,
+                #                                            leave_id = leave_obj,
+                #                                            isActive = True,
+                #                                            year = leave_obj.date_from.year,
+                #                                            insertUser = request.user.id,
+                #                                            insertDate = date.today(),
+                #                                            insertType = 'insert',
+                #                                            project = '1',
+                #                                            frequency_count = frequency_count)
+                #     new_leave_balance_obj.save()
+
+
+                message = 'applied'
+
+            elif balance_check == True:
+                message = 'extra'
+
+            elif duplicate_check == True:
+                message = 'duplicate'
+            else:
+                message = 'miscount'
+
+            return redirect('leave:business_trip_apply', message=message)
+
+        pending_list = LeaveHistory.objects.filter(employee_id=obj.employee_id, endorsement='0' )
+        context['pending_list'] = pending_list
+
+        if message == 'add':
+            context['form_message'] = ''
+        elif message == 'extra':
+            context['form_message'] = 'You cannot apply for more days than your balance'
+        elif message == 'duplicate':
+            context['form_message'] = 'Duplicate Entry!! Already Applied for the date'
+        elif message == 'applied':
+            context['form_message'] = 'Leave Application is submitted successfully to ' + obj.supervisor.get_gender_display() + ' ' + obj.supervisor.employeeName
+        elif message == 'miscount':
+            context['form_message'] = 'Day Calculation is not Correct'
+        else:
+            context['form_message'] = 'Some error Occured'
+
+
+    except ObjectDoesNotExist:
+        context['error_message'] = '!!!  This page is for Employee  !!!'
+
+    return render(request, 'leave/business_trip_apply.html', context)
 
 @login_required
 def pendingApplication(request):
@@ -459,6 +1352,9 @@ def pendingApplication(request):
         context['pending_application_list'] = pending_application_list
         pending_confirmation_list = LeaveHistory.objects.filter(confirmed_by = request.user.employeeuser.employee, endorsement='3', isActive=True)
         context['pending_confirmation_list'] = pending_confirmation_list
+
+        application_list = LeaveHistory.objects.filter(endorsed_by = request.user.employeeuser.employee, isActive=True, endorsement__in=['1','3'], date_from__year=date.today().year).order_by('employee_id__employeeName')
+        context['application_list'] = application_list
     except:
         context['error_message'] = '!!! This page is for Employee !!!'
 
@@ -835,7 +1731,7 @@ def leave_print(request, leave_id):
             if joining_date == leave_obj.date_from.year :
                 try:
                     allocated_balance = round((leave_category_obj.amount / 365) * (365 - leave_category_obj.employee_id.joiningDate.timetuple().tm_yday))
-
+                    print(allocated_balance)
                 except:
                     error_message ="Incomplete Employee Info. \n No Joining Date!!!"
                     context['joining_date_null_error'] = error_message

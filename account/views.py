@@ -251,7 +251,7 @@ def user_calender(request):
                 start = list.date
                 end = list.date
         data.append({'title' : title, 'start' : start, 'end' : end})
-        data.append({'title' : title, 'start' : '2017-03-24', 'end' : '2017-03-28'})
+        # data.append({'title' : title, 'start' : '2017-03-24', 'end' : '2017-03-28'})
 
 
         # data = [
@@ -265,7 +265,7 @@ def user_calender(request):
         #         'end': '2010-01-07'
         #     }
         # ]
-        print(data)
+        # print(data)
         return JsonResponse(data, safe=False)
 
     return render(request, 'account/user_calender.html')
